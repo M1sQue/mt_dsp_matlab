@@ -10,8 +10,7 @@ polars = zeros(num_polar_freq, num_angles);
 figure;
 hold on;
 for i = 1:num_angles
-    filename = sprintf("Microphone_Impulse_Responses/ShureSM58_125cm_Normalised_IRs/IRs/ShureSM58_125cm_%dDeg.wav", ...
-        angles(i));
+    filename = sprintf("Microphone_Impulse_Responses/ShureSM58_125cm_Normalised_IRs/IRs/ShureSM58_125cm_%dDeg.wav", angles(i));
     [ir_data{i}, fs] = audioread(filename);
     N = length(ir_data{i});
     freq = (1:N)*(fs/N);
@@ -48,3 +47,4 @@ rlim([-40 15]);
 rticks(-40:5:15);
 title("Directivity Pattern");
 
+save("polars", "polars", "polar_freq");

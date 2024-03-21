@@ -1,3 +1,6 @@
+clear;
+load("polars.mat");
+
 f_sound = 1000;
 
 r = 0.1;
