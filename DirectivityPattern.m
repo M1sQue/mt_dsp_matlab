@@ -1,4 +1,7 @@
-angles = 0:5:355;
+clear;
+
+step = 5;
+angles = 0:step:355;
 num_angles = length(angles);
 ir_data = cell(1, num_angles);
 fft_data = cell(1, num_angles);
@@ -16,9 +19,10 @@ for i = 1:num_angles
     freq = (1:N)*(fs/N);
     freq = freq(1:N/2);
     fft_data{i} = fft(ir_data{i});
-    magnitude = 20*log10(abs(fft_data{1, i}(1:N/2)));
+    magnitude = mag2db(abs(fft_data{1, i}(1:N/2)));
     for j = 1:num_polar_freq
-        polars(j, i) = magnitude(polar_freq(j)*N/fs);
+        index = 1+mod(i-1+90/step,360/step);
+        polars(j, index) = magnitude(polar_freq(j)*N/fs);
     end
     plot(freq, magnitude);
 end
