@@ -22,12 +22,14 @@ sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
 sound_delays = sound_delay_positions*m_pos/c;
 
-temp = 0;
+temp = -1;
 for i=1:numel(polar_freq)
     if polar_freq(i) == f_sound
         temp = i;
-        break;
     end
+end
+if temp == -1
+    error("Frequency %dHz is not found in the directivity pattern.", f_sound);
 end
 sys = db2mag(repmat(polars(temp,:), numel(m_pos(1,:)), 1)');
 
