@@ -27,13 +27,19 @@ s_pos = [cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)]
 
 % delay and sum algorithm
 dasb_delay = s_pos*m_pos/c;
-dasb = exp(-1j*2*pi*f_sound*dasb_delay);
+d_dasb = exp(-1j*2*pi*f_sound*dasb_delay)/numel(m_pos(1,:));
+w_dasb = d_dasb;
+
+% mvdr algorithm
+d_mvdr = d_dasb';
+Phi_NN_inv = ones(6, 6);
+w_mvdr = (Phi_NN_inv*d_mvdr/(d_mvdr'*Phi_NN_inv*d_mvdr))';
 
 % simulation parameters
 sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
 sound_delays = sound_delay_positions*m_pos/c;
-simulations = dasb*(exp(1j*2*pi*f_sound*sound_delays).*sys)'/numel(m_pos(1,:));
+simulations = w_dasb*(exp(1j*2*pi*f_sound*sound_delays).*sys)';
 
 % simulation polar plot
 threshold = -30;

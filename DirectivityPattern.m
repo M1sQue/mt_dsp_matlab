@@ -6,7 +6,7 @@ num_angles = length(angles);
 ir_data = cell(1, num_angles);
 fft_data = cell(1, num_angles);
 
-polar_freq = [500 1000 2000 4000];
+polar_freq = [500 1000 2000 4000 8000];
 num_polar_freq = length(polar_freq);
 polars = zeros(num_polar_freq, num_angles);
 
