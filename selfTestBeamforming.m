@@ -51,6 +51,6 @@ end
 polarplot(sound_delay_angles, 20*log10(abs(simulations)));
 thetalim([0 360]);
 thetaticks(0:45:315);
-rlim([threshold 10]);
-rticks(threshold:5:10);
+rlim([threshold 30]);
+rticks(threshold:5:30);
 title(sprintf("azimuth %d°, elevation %d°, frequency %dHz", azimuth_deg, elevation_deg, f_sound));
