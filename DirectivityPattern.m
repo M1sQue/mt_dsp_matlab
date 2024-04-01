@@ -6,7 +6,7 @@ num_angles = length(angles);
 ir_data = cell(1, num_angles);
 fft_data = cell(1, num_angles);
 
-polar_freq = [500 800 1000 2000 4000 8000 10000];
+polar_freq = [500 1000 2000 4000 8000];
 num_polar_freq = length(polar_freq);
 polars = zeros(num_polar_freq, num_angles);
 
@@ -14,7 +14,8 @@ figure;
 hold on;
 for i = 1:num_angles
     %filename = sprintf("Microphone_Impulse_Responses/ShureSM58_125cm_Normalised_IRs/IRs/ShureSM58_125cm_%dDeg.wav", angles(i));
-    filename = sprintf("AnechoicRoomMeasurements/IRs_Channel_1/IR_monG7SMCCBW_%d_Channel_1.wav", angles(i));
+    filename = sprintf("AnechoicRoomMeasurements/IRs_Channel_1_Hann/IR_monG7SMCCBW_%d_Channel_1.wav", angles(i));
+    %filename = sprintf("AnechoicRoomMeasurements/IRs_Channel_1_Hann/IR_monCQGLL74L_%d_Channel_1.wav", angles(i));
     [ir_data{i}, fs] = audioread(filename);
     N = length(ir_data{i});
     freq = (1:N)*(fs/N);
