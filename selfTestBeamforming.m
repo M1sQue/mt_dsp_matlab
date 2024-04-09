@@ -1,5 +1,9 @@
 clear;
-load("polars.mat");
+polars_cell = cell(1,6);
+for i = 1:6
+    load(sprintf("polars_average_channel_%d.mat", i));
+    polars_cell{i} = polars;
+end
 
 f_sound = 1000; % sound frequency for beamforming
 r = 0.1; % coordinate unit length
@@ -16,7 +20,8 @@ end
 if temp == -1
     error("Frequency %dHz is not found in the directivity pattern.", f_sound);
 end
-sys = db2mag(repmat(polars(temp,:), numel(m_pos(1,:)), 1)');
+sys = [polars_cell{1}(temp, :); polars_cell{2}(temp, :); polars_cell{3}(temp, :); polars_cell{4}(temp, :); polars_cell{5}(temp, :); polars_cell{6}(temp, :)]';
+sys = db2mag(sys);
 
 % sound source parameters definition
 azimuth_deg = 0;
