@@ -11,11 +11,11 @@ num_polar_freq = length(polar_freq);
 polars = zeros(num_polar_freq, num_angles);
 
 figure;
+channel = 1;
 hold on;
 for i = 1:num_angles
     %filename = sprintf("Microphone_Impulse_Responses/ShureSM58_125cm_Normalised_IRs/IRs/ShureSM58_125cm_%dDeg.wav", angles(i));
-    filename = sprintf("AnechoicRoomMeasurements/IRs_Channel_1_Hann/IR_monG7SMCCBW_%d_Channel_1.wav", angles(i));
-    %filename = sprintf("AnechoicRoomMeasurements/IRs_Channel_1_Hann/IR_monCQGLL74L_%d_Channel_1.wav", angles(i));
+    filename = sprintf("AnechoicRoomMeasurements/IRs_Channel_%d_Hann/IR_monGHHX_%d_Channel_%d.wav", channel, angles(i), channel);
     [ir_data{i}, fs] = audioread(filename);
     N = length(ir_data{i});
     freq = (1:N)*(fs/N);
@@ -32,7 +32,7 @@ hold off;
 xlabel("Frequency (Hz)");
 ylabel("Magnitude (dB)");
 
-title('FFTs');
+title(sprintf("FFTs for Channel %d", channel));
 
 figure;
 angles = [angles 360];
@@ -51,6 +51,6 @@ thetalim([0 360]);
 thetaticks(0:45:315);
 rlim([-40 20]);
 rticks(-40:5:20);
-title("Directivity Pattern");
+title(sprintf("Directivity Pattern for Channel %d", channel));
 
 save("polars", "polars", "polar_freq");
