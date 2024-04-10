@@ -11,7 +11,7 @@ num_polar_freq = length(polar_freq);
 polars = zeros(num_polar_freq, num_angles);
 
 monName = ["monCQGLL74L" "monG7SMCCBW" "monKD8N255G" "monGHHX" "mon99PJ"];
-channel = 1;
+channel = 2;
 for k = 1:5
     for i = 1:num_angles
         %filename = sprintf("Microphone_Impulse_Responses/ShureSM58_125cm_Normalised_IRs/IRs/ShureSM58_125cm_%dDeg.wav", angles(i));
