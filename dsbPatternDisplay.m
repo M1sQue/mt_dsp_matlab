@@ -22,7 +22,7 @@ end
 
 % sound source parameters definition
 azimuth_deg = 0;
-elevation_deg = -90;
+elevation_deg = -45;
 azimuth = deg2rad(azimuth_deg);
 elevation = deg2rad(elevation_deg);
 s_pos = [cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
@@ -42,7 +42,7 @@ for i = 1:numFreq
 end
 
 % simulation polar plot
-threshold = -30;
+threshold = -60;
 simulations_dB = 20 * log10(abs(simulations));
 under_threshold_indices = simulations_dB < threshold;
 simulations_dB(under_threshold_indices) = threshold;
@@ -60,6 +60,6 @@ legend;
 
 thetalim([0 360]);
 thetaticks(0:45:315);
-rlim([threshold 20]);
-rticks(threshold:5:20);
+rlim([threshold 0]);
+rticks(threshold:5:0);
 title(sprintf("Delay and Sum with 6 channel avg directivity patterns \n azimuth %d°, elevation %d°", azimuth_deg, elevation_deg));

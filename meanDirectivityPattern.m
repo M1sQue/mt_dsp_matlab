@@ -11,7 +11,7 @@ num_polar_freq = length(polar_freq);
 polars = zeros(num_polar_freq, num_angles);
 
 monName = ["monCQGLL74L" "monG7SMCCBW" "monKD8N255G" "monGHHX" "mon99PJ"];
-channel = 2;
+channel = 1;
 for k = 1:5
     for i = 1:num_angles
         %filename = sprintf("Microphone_Impulse_Responses/ShureSM58_125cm_Normalised_IRs/IRs/ShureSM58_125cm_%dDeg.wav", angles(i));
@@ -28,6 +28,8 @@ for k = 1:5
 end
 polars = polars/5;
 polars = mag2db(polars);
+maxMag = max(polars(:));
+polars = polars-maxMag*ones(numel(polars(:,1)), numel(polars(1,:)));
 
 figure;
 angles = [angles 360];
@@ -44,8 +46,8 @@ polarplot(tbl, "Angles (rad)", polar_freq_labels, 'Linewidth', 1);
 legend;
 thetalim([0 360]);
 thetaticks(0:45:315);
-rlim([-40 20]);
-rticks(-40:5:20);
+rlim([-60 0]);
+rticks(-60:5:0);
 title(sprintf("Average Directivity Pattern for Channel %d", channel));
 
 save(sprintf("polars_average_channel_%d", channel), "polars", "polar_freq");
