@@ -15,7 +15,7 @@ channel = 1;
 hold on;
 for i = 1:num_angles
     %filename = sprintf("Microphone_Impulse_Responses/ShureSM58_125cm_Normalised_IRs/IRs/ShureSM58_125cm_%dDeg.wav", angles(i));
-    filename = sprintf("AnechoicRoomMeasurements/IRs_Channel_%d_Hann/IR_monGHHX_%d_Channel_%d.wav", channel, angles(i), channel);
+    filename = sprintf("AnechoicRoomMeasurements/IRs_Channel_%d_Hann/IR_monKD8N255G_%d_Channel_%d.wav", channel, angles(i), channel);
     [ir_data{i}, fs] = audioread(filename);
     N = length(ir_data{i});
     freq = (1:N)*(fs/N);
