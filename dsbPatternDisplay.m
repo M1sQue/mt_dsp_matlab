@@ -35,10 +35,10 @@ w_dasb = d_dasb;
 % simulation parameters
 sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
-sound_delays = sound_delay_positions*m_pos/c;
+sound_delays = -sound_delay_positions*m_pos/c;
 simulations = zeros(numFreq,numel(sound_delay_angles));
 for i = 1:numFreq
-    simulations(i,:) = w_dasb(i,:)*(exp(1j*2*pi*f_sound(i)*sound_delays).*sys{i})';
+    simulations(i,:) = w_dasb(i,:)*(exp(-1j*2*pi*f_sound(i)*sound_delays).*sys{i})';
 end
 
 % simulation polar plot

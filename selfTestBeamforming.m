@@ -25,24 +25,24 @@ sys = db2mag(sys);
 
 % sound source parameters definition
 azimuth_deg = 0;
-elevation_deg = -90;
+elevation_deg = -45;
 azimuth = deg2rad(azimuth_deg);
 elevation = deg2rad(elevation_deg);
 s_pos = [cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
 
 % delay and sum algorithm
-dasb_delay = s_pos*m_pos/c;
+dasb_delay = s_pos*m_pos/c; % to compensate the delay aka alignment: times "-" to a "-"
 d_dasb = exp(-1j*2*pi*f_sound*dasb_delay)/numel(m_pos(1,:));
 w_dasb = d_dasb;
 
 % simulation parameters
 sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
-sound_delays = sound_delay_positions*m_pos/c;
-simulations = w_dasb*(exp(1j*2*pi*f_sound*sound_delays).*sys)';
+sound_delays = -sound_delay_positions*m_pos/c; % to simulate the propagation: with "-"
+simulations = w_dasb*(exp(-1j*2*pi*f_sound*sound_delays).*sys)'; % to simulate signals from all directions: with "-"
 
 % simulation polar plot
-threshold = -30;
+threshold = -60;
 for i = 1:numel(sound_delay_angles)
     if 20*log10(abs(simulations(i))) < threshold
         simulations(i) = 10^(threshold/20);
@@ -51,6 +51,6 @@ end
 polarplot(sound_delay_angles, 20*log10(abs(simulations)));
 thetalim([0 360]);
 thetaticks(0:45:315);
-rlim([threshold 30]);
-rticks(threshold:5:30);
+rlim([threshold 0]);
+rticks(threshold:5:0);
 title(sprintf("azimuth %d°, elevation %d°, frequency %dHz", azimuth_deg, elevation_deg, f_sound));

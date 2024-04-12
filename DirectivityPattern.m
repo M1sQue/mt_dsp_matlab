@@ -23,7 +23,7 @@ for i = 1:num_angles
     fft_data{i} = fft(ir_data{i});
     magnitude = mag2db(abs(fft_data{1, i}(1:N/2)));
     for j = 1:num_polar_freq
-        index = 1+mod(i-1+90/step,360/step);
+        index = 1+mod(i-1+270/step,360/step);
         polars(j, index) = magnitude(polar_freq(j)*N/fs);
     end
     plot(freq, magnitude);
