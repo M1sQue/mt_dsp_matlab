@@ -28,7 +28,7 @@ elevation = deg2rad(elevation_deg);
 s_pos = [cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
 
 % delay and sum algorithm
-dasb_delay = s_pos*m_pos/c;
+dasb_delay = s_pos*m_pos/norm(s_pos)/c;
 d_dasb = exp(-1j*2*pi*f_sound'*dasb_delay)/numel(m_pos(1,:));
 w_dasb = d_dasb;
 
@@ -38,7 +38,7 @@ sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_a
 sound_delays = -sound_delay_positions*m_pos/c;
 simulations = zeros(numFreq,numel(sound_delay_angles));
 for i = 1:numFreq
-    simulations(i,:) = w_dasb(i,:)*(exp(-1j*2*pi*f_sound(i)*sound_delays).*sys{i})';
+    simulations(i,:) = w_dasb(i,:)*(exp(-1j*2*pi*f_sound(i)*sound_delays).*sys{i}).';
 end
 
 % simulation polar plot
