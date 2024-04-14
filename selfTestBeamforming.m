@@ -1,7 +1,7 @@
 clear;
 polars_cell = cell(1,6);
 for i = 1:6
-    load(sprintf("polars_average_channel_%d.mat", i));
+    load(sprintf("MatData/polars_average_channel_%d.mat", i));
     polars_cell{i} = polars;
 end
 
