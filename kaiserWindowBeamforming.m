@@ -7,24 +7,17 @@ end
 
 f_sound = polar_freq; % sound frequency for beamforming
 % f_sound = [2000]; % sound frequency for beamforming
-r = 0.035; % coordinate unit length
+r = 0.1; % coordinate unit length
 c = 343.3; % speed of sound
 
 % microphone system parameters definition
-%m_pos = [r 0 0; r/2 -sqrt(3)/2*r 0; -r/2 -sqrt(3)/2*r 0; -r 0 0; -r/2 sqrt(3)/2*r 0; r/2 sqrt(3)/2*r 0]';
+m_pos = [r 0 0; r/2 -sqrt(3)/2*r 0; -r/2 -sqrt(3)/2*r 0; -r 0 0; -r/2 sqrt(3)/2*r 0; r/2 sqrt(3)/2*r 0]';
 %m_pos = [0 0 0; r 0 0; 0 -r 0; -r 0 0; 0 r 0; 2*r 0 0; 2*r/2 -sqrt(3)/2*2*r 0; -2*r/2 -sqrt(3)/2*2*r 0; -2*r 0 0; -2*r/2 sqrt(3)/2*2*r 0; 2*r/2 sqrt(3)/2*2*r 0; 3*r 0 0; 0 -3*r 0; -3*r 0 0; 0 3*r 0; 2*3*r 0 0; 2*3*r/2 -sqrt(3)/2*2*3*r 0; -2*3*r/2 -sqrt(3)/2*2*3*r 0; -2*3*r 0 0; -2*3*r/2 sqrt(3)/2*2*3*r 0; 2*3*r/2 sqrt(3)/2*2*3*r 0]';
-m_pos = [-5*r 0 0; -4*r 0 0; -3*r 0 0; -2*r 0 0; -r 0 0; 0 0 0; r 0 0; 2*r 0 0; 3*r 0 0; 4*r 0 0; 5*r 0 0]';
-% directivity patterns of target frequencies
-numFreq = numel(polar_freq);
-sys = cell(1,numFreq);
-
-for i = 1:numFreq
-    sys{i} = db2mag([polars_cell{1}(i, :); polars_cell{2}(i, :); polars_cell{3}(i, :); polars_cell{4}(i, :); polars_cell{5}(i, :); polars_cell{6}(i, :)]');
-end
+%m_pos = [-5*r 0 0; -4*r 0 0; -3*r 0 0; -2*r 0 0; -r 0 0; 0 0 0; r 0 0; 2*r 0 0; 3*r 0 0; 4*r 0 0; 5*r 0 0]';
 
 % sound source parameters definition
 azimuth_deg = 0;
-elevation_deg = 0;
+elevation_deg = 90;
 azimuth = deg2rad(azimuth_deg);
 elevation = deg2rad(elevation_deg);
 s_pos = [cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
@@ -32,8 +25,23 @@ s_pos = [cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)]
 % kaiser window beamformer algorithm
 % define target center beamwidth
 theta_CBW = 40; % degree
+f_min = c/(numel(m_pos(1,:))*r*sin(deg2rad(theta_CBW/2)));
+f_max = c/r;
+%check if it is applicable to certain freq
+f_sound_index = (f_sound < f_max) & (f_sound > f_min);
+f_sound = f_sound(f_sound_index);
+
+% directivity patterns of target frequencies
+numFreq = numel(f_sound);
+sys = cell(1,numFreq);
+
+for i = 1:numFreq
+    sys{i} = db2mag([polars_cell{1}(i, :); polars_cell{2}(i, :); polars_cell{3}(i, :); polars_cell{4}(i, :); polars_cell{5}(i, :); polars_cell{6}(i, :)]');
+end
+
+
 %???
-A_SL =(26*11*f_sound*r/c)*sin(deg2rad(theta_CBW)/2)-12; % sidelobe amplitude
+A_SL =(26*numel(m_pos(1,:))*f_sound*r/c)*sin(deg2rad(theta_CBW/2))-12; % sidelobe amplitude
 beta = 0.76608*(A_SL-13.26).^0.4 + 0.09834*(A_SL-13.26);
 
 kw_delay = s_pos*m_pos/norm(s_pos)/c;
@@ -42,7 +50,7 @@ kw_index = kw_delay/max_delay;  % (-1,1)
 d_kw = exp(-1j*2*pi*f_sound'*kw_delay)/numel(m_pos(1,:));
 
 % weights
-w_kw = besseli(0,beta.'*sqrt(1-kw_index.^2))./repmat(besseli(0,beta).',1,numel(kw_index));
+w_kw = besseli(0,beta'*sqrt(1-kw_index.^2))./repmat(besseli(0,beta)',1,numel(kw_index));
 % simulation parameters
 sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
@@ -53,17 +61,17 @@ for i = 1:numFreq
 end
 
 % simulation polar plot
-threshold = -100;
+threshold = -60;
 simulations_dB = 20 * log10(abs(simulations));
 under_threshold_indices = simulations_dB < threshold;
 simulations_dB(under_threshold_indices) = threshold;
 
 tbl = array2table([sound_delay_angles' simulations_dB']);
 tbl = renamevars(tbl, "Var1", "Angles (rad)");
-polar_freq_labels = string(polar_freq);
+polar_freq_labels = string(f_sound);
 for i = 1:numFreq
-    polar_freq_labels(i) = sprintf("%dHz",polar_freq(i));
-    tbl = renamevars(tbl, sprintf("Var%d",i+1), sprintf("%dHz",polar_freq(i)));
+    polar_freq_labels(i) = sprintf("%dHz",f_sound(i));
+    tbl = renamevars(tbl, sprintf("Var%d",i+1), sprintf("%dHz",f_sound(i)));
 end
 figure("Name","Beam Patterns of Kaiser Window(polar plot)");
 polarplot(tbl, "Angles (rad)", polar_freq_labels, 'Linewidth', 1);
