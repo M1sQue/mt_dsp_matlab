@@ -5,7 +5,7 @@ for i = 1:6
     polars_cell{i} = polars;
 end
 
-f_sound = 4000; % sound frequency for beamforming
+f_sound = 1000; % sound frequency for beamforming
 r = 0.1; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -37,7 +37,7 @@ w_dasb = d_dasb;
 
 % mvdr algorithm
 d_mvdr = d_dasb';
-n_mics = 6;
+n_mics = numel(m_pos(1,:));
 Phi_NN = ones(n_mics, n_mics);
 [noise, fs] = audioread("Temporary/noisebelow_mon_2_.wav");
 for i = 1:n_mics
@@ -57,7 +57,7 @@ w_mvdr = w_mvdr/sum(abs(w_mvdr));
 sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
 sound_delays = -sound_delay_positions*m_pos/c; % to simulate the propagation: with "-"
-simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays)).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
+simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays).*sys).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
 
 % simulation polar plot
 threshold = -60;
