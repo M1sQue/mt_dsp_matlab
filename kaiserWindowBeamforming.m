@@ -1,7 +1,7 @@
 clear;
 polars_cell = cell(1,6);
 for i = 1:6
-    load(sprintf("polars_average_channel_%d.mat", i));
+    load(sprintf("MatData/polars_average_channel_%d.mat", i));
     polars_cell{i} = polars;
 end
 
@@ -31,7 +31,7 @@ s_pos = [cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)]
 
 % kaiser window beamformer algorithm
 % define target center beamwidth
-theta_CBW = 20; % degree
+theta_CBW = 40; % degree
 %???
 A_SL =(26*11*f_sound*r/c)*sin(deg2rad(theta_CBW)/2)-12; % sidelobe amplitude
 beta = 0.76608*(A_SL-13.26).^0.4 + 0.09834*(A_SL-13.26);
