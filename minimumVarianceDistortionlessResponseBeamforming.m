@@ -5,7 +5,7 @@ for i = 1:6
     polars_cell{i} = polars;
 end
 
-f_sound = 1000; % sound frequency for beamforming
+f_sound = 4000; % sound frequency for beamforming
 r = 0.1; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -40,26 +40,24 @@ d_mvdr = d_dasb';
 n_mics = 6;
 Phi_NN = ones(n_mics, n_mics);
 [noise, fs] = audioread("Temporary/noisebelow_mon_2_.wav");
-f_res = fs/length(noise);  % Frequency resolution
-f_index = round(f_sound/f_res);  % Index of the frequency of interest
 for i = 1:n_mics
     for j = i:n_mics  % Symmetric matrix, compute half and mirror
         [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
+        f_index = round(f_sound/(fs/2)*numel(f));
         Phi_NN(i,j) = cpsd_ij(f_index);
         Phi_NN(j,i) = Phi_NN(i,j);  % Mirror since matrix is Hermitian
     end
 end
 Phi_NN_inv = inv(Phi_NN);  % Compute the inverse of the noise covariance matrix
 % After computing Phi_NN_inv
-max_val = max(max(abs(Phi_NN_inv)));  % Find the maximum absolute value in the matrix
-Phi_NN_inv = Phi_NN_inv / max_val;  % Normalize so the max absolute value is now 1 (0 dB)
 w_mvdr = (Phi_NN_inv*d_mvdr/(d_mvdr'*Phi_NN_inv*d_mvdr)).';
+w_mvdr = w_mvdr/sum(abs(w_mvdr));
 
 % simulation parameters
 sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
 sound_delays = -sound_delay_positions*m_pos/c; % to simulate the propagation: with "-"
-simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays).*sys).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
+simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays)).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
 
 % simulation polar plot
 threshold = -60;
