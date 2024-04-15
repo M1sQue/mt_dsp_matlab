@@ -56,7 +56,7 @@ rlim([threshold 0]);
 rticks(threshold:5:0);
 title(sprintf("azimuth %d°, elevation %d°, frequency %dHz", azimuth_deg, elevation_deg, f_sound));
 
-%% Display as an animation
+%% display as an animation
 clear;
 % Load microphone array data
 polars_cell = cell(1,6);
