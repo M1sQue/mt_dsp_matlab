@@ -1,4 +1,4 @@
-%% display as a figure
+%% prototype: display as a figure
 clear;
 polars_cell = cell(1,6);
 for i = 1:6
@@ -56,7 +56,7 @@ rlim([threshold 0]);
 rticks(threshold:5:0);
 title(sprintf("azimuth %d°, elevation %d°, frequency %dHz", azimuth_deg, elevation_deg, f_sound));
 
-%% display as an animation
+%% prototype: display as an animation
 clear;
 % Load microphone array data
 polars_cell = cell(1,6);
