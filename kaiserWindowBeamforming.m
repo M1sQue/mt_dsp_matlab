@@ -160,13 +160,13 @@ for elevation_deg = elevation_range
     
     % simulation polar plot
     H_threshold = max(max(mag2db(abs(simulations))));
-    L_threshold = H_threshold - 20;
+    L_threshold = H_threshold - 10;
     simulations_dB = 20 * log10(abs(simulations));
     under_threshold_indices = simulations_dB < L_threshold;
     simulations_dB(under_threshold_indices) = L_threshold;
     
     steering_direction = L_threshold*ones(1,numel(sound_delay_angles));
-    steering_index = mod(round(elevation_deg/5)+72,73)+1;
+    steering_index = mod(round(elevation_deg/5)+73,73)+1;
     steering_direction(steering_index) = 0; %direction of elevation_deg
     
     tbl = array2table([sound_delay_angles' simulations_dB' steering_direction']);
@@ -178,7 +178,7 @@ for elevation_deg = elevation_range
     end
     tbl = renamevars(tbl, sprintf("Var%d",numFreq+2), "desired direction");
     polar_freq_labels = [polar_freq_labels "desired direction"];
-    polarplot(tbl, "Angles (rad)", polar_freq_labels, 'Linewidth', 1);
+    polarplot(tbl, "Angles (rad)", polar_freq_labels, 'Linewidth', 2);
     legend;
     
     thetalim([0 360]);
@@ -187,4 +187,4 @@ for elevation_deg = elevation_range
     rticks(L_threshold:5:H_threshold);
     title(sprintf("Kaiser Window with 6 channel avg directivity patterns \n azimuth %d°, elevation %d°", azimuth_deg, elevation_deg));
     drawnow;
-end;
+end

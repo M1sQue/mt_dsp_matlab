@@ -109,18 +109,25 @@ for elevation_deg = elevation_range
     sound_delay_angles = deg2rad(0:5:360);
     sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
     sound_delays = -sound_delay_positions*m_pos/c;
-    % simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays).*sys).';
+    % simulations = w_dasb*(exp(-1j*2*pi*f_sound*sound_delays).*sys).';
     simulations = w_dasb*(exp(-1j*2*pi*f_sound*sound_delays)).';
 
     % Plotting
     H_threshold = max(mag2db(abs(simulations)));
-    L_threshold = H_threshold - 20;
+    L_threshold = H_threshold - 10;
     for i = 1:numel(sound_delay_angles)
         if mag2db(abs(simulations(i))) < L_threshold
             simulations(i) = db2mag(L_threshold);
         end
     end
+    steering_direction = L_threshold*ones(1,numel(sound_delay_angles));
+    steering_index = mod(round(elevation_deg/5)+73,73)+1;
+    steering_direction(steering_index) = 0; %direction of elevation_deg
+    
     polarplot(sound_delay_angles, mag2db(abs(simulations)), 'LineWidth', 2);
+    hold on;
+    polarplot(sound_delay_angles, steering_direction, 'LineWidth', 2);
+    hold off;
     thetalim([0 360]);
     thetaticks(0:45:315);
     rlim([L_threshold H_threshold]);

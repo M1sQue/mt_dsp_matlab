@@ -26,7 +26,7 @@ sys = db2mag(sys);
 
 % sound source parameters definition
 azimuth_deg = 0;
-elevation_deg = -45;
+elevation_deg = -90;
 azimuth = deg2rad(azimuth_deg);
 elevation = deg2rad(elevation_deg);
 s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
@@ -40,7 +40,7 @@ w_dasb = d_dasb;
 d_mvdr = d_dasb';
 n_mics = numel(m_pos(1,:));
 Phi_NN = ones(n_mics, n_mics);
-[noise, fs] = audioread("Temporary/noisebelow_mon_2_.wav");
+[noise, fs] = audioread("Temporary/testNoiseSineSweep.wav");
 for i = 1:n_mics
     for j = i:n_mics  % Symmetric matrix, compute half and mirror
         [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
@@ -85,12 +85,13 @@ for i = 1:6
 end
 
 % Sound and system parameters
-f_sound = 4000; % sound frequency for beamforming
+f_sound = 1000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
 % Microphone positions
 m_pos = [r 0 0; r/2 -sqrt(3)/2*r 0; -r/2 -sqrt(3)/2*r 0; -r 0 0; -r/2 sqrt(3)/2*r 0; r/2 sqrt(3)/2*r 0]';
+% m_pos = [r 0 0; 2*r 0 0; 3*r 0 0; 4*r 0 0; 5*r 0 0; 6*r 0 0]';
 
 % Find frequency index
 temp = -1;
@@ -127,7 +128,7 @@ for elevation_deg = elevation_range
     d_mvdr = d_dasb';
     n_mics = numel(m_pos(1,:));
     Phi_NN = ones(n_mics, n_mics);
-    [noise, fs] = audioread("Temporary/noisebelow_mon_2_.wav");
+    [noise, fs] = audioread("Temporary/testNoiseSineSweep.wav");
     for i = 1:n_mics
         for j = i:n_mics  % Symmetric matrix, compute half and mirror
             [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
@@ -150,13 +151,20 @@ for elevation_deg = elevation_range
 
     % Plotting
     H_threshold = max(mag2db(abs(simulations)));
-    L_threshold = H_threshold - 20;
+    L_threshold = H_threshold - 10;
     for i = 1:numel(sound_delay_angles)
         if mag2db(abs(simulations(i))) < L_threshold
             simulations(i) = db2mag(L_threshold);
         end
     end
+    steering_direction = L_threshold*ones(1,numel(sound_delay_angles));
+    steering_index = mod(round(elevation_deg/5)+73,73)+1;
+    steering_direction(steering_index) = 0; %direction of elevation_deg
+
     polarplot(sound_delay_angles, mag2db(abs(simulations)), 'LineWidth', 2);
+    hold on;
+    polarplot(sound_delay_angles, steering_direction, 'LineWidth', 2);
+    hold off;
     thetalim([0 360]);
     thetaticks(0:45:315);
     rlim([L_threshold H_threshold]);
