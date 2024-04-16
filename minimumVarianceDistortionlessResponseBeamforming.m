@@ -40,7 +40,7 @@ w_dasb = d_dasb;
 d_mvdr = d_dasb';
 n_mics = numel(m_pos(1,:));
 Phi_NN = ones(n_mics, n_mics);
-[noise, fs] = audioread("Temporary/testNoiseSineSweep.wav");
+[noise, fs] = audioread("MonitorNoiseAudio\audio_noisy\MO202501-WQB4BVWP-20211017-193500-MULTICHANNEL_SNRpri_-12dB.flac");
 for i = 1:n_mics
     for j = i:n_mics  % Symmetric matrix, compute half and mirror
         [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
@@ -58,7 +58,8 @@ w_mvdr = w_mvdr/sum(abs(w_mvdr));
 sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
 sound_delays = -sound_delay_positions*m_pos/c; % to simulate the propagation: with "-"
-simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays).*sys).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
+% simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays).*sys).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
+simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays)).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
 
 % simulation polar plot
 H_threshold = max(mag2db(abs(simulations)));
@@ -85,7 +86,7 @@ for i = 1:6
 end
 
 % Sound and system parameters
-f_sound = 1000; % sound frequency for beamforming
+f_sound = 4000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -128,7 +129,7 @@ for elevation_deg = elevation_range
     d_mvdr = d_dasb';
     n_mics = numel(m_pos(1,:));
     Phi_NN = ones(n_mics, n_mics);
-    [noise, fs] = audioread("Temporary/testNoiseSineSweep.wav");
+    [noise, fs] = audioread("MonitorNoiseAudio\controlled_snr\SNR_-15.wav", [1 100000]);
     for i = 1:n_mics
         for j = i:n_mics  % Symmetric matrix, compute half and mirror
             [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
