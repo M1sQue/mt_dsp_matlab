@@ -121,7 +121,11 @@ for elevation_deg = elevation_range
         end
     end
     steering_direction = L_threshold*ones(1,numel(sound_delay_angles));
-    steering_index = mod(round(elevation_deg/5)+73,73)+1;
+    if elevation_deg <= 0
+        steering_index = mod(round(elevation_deg/5)+72,73)+1;
+    else 
+        steering_index = mod(round(elevation_deg/5)+73,73)+1;
+    end
     steering_direction(steering_index) = 0; %direction of elevation_deg
     
     polarplot(sound_delay_angles, mag2db(abs(simulations)), 'LineWidth', 2);

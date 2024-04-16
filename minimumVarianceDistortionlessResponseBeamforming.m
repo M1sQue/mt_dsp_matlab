@@ -37,7 +37,7 @@ d_dasb = exp(-1j*2*pi*f_sound*dasb_delay)/numel(m_pos(1,:));
 w_dasb = d_dasb;
 
 % mvdr algorithm
-d_mvdr = d_dasb';
+d_mvdr = d_dasb.';
 n_mics = numel(m_pos(1,:));
 Phi_NN = ones(n_mics, n_mics);
 [noise, fs] = audioread("MonitorNoiseAudio\audio_noisy\MO202501-WQB4BVWP-20211017-193500-MULTICHANNEL_SNRpri_-12dB.flac");
@@ -126,7 +126,7 @@ for elevation_deg = elevation_range
     w_dasb = d_dasb;
 
     % MVDR beamforming
-    d_mvdr = d_dasb';
+    d_mvdr = d_dasb.';
     n_mics = numel(m_pos(1,:));
     Phi_NN = ones(n_mics, n_mics);
     [noise, fs] = audioread("Temporary/SNR_-15.wav", [1 100000]);
@@ -159,12 +159,16 @@ for elevation_deg = elevation_range
         end
     end
     steering_direction = L_threshold*ones(1,numel(sound_delay_angles));
-    steering_index = mod(round(elevation_deg/5)+73,73)+1;
+    if elevation_deg <= 0
+        steering_index = mod(round(elevation_deg/5)+72,73)+1;
+    else 
+        steering_index = mod(round(elevation_deg/5)+73,73)+1;
+    end
     steering_direction(steering_index) = 0; %direction of elevation_deg
 
     polarplot(sound_delay_angles, mag2db(abs(simulations)), 'LineWidth', 2);
     hold on;
-    polarplot(sound_delay_angles, steering_direction, 'LineWidth', 2);
+    polarplot(sound_delay_angles, steering_direction, 'LineWidth', 2)%;
     hold off;
     thetalim([0 360]);
     thetaticks(0:45:315);
