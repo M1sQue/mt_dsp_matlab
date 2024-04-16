@@ -40,13 +40,15 @@ w_dasb = d_dasb;
 d_mvdr = d_dasb.';
 n_mics = numel(m_pos(1,:));
 Phi_NN = ones(n_mics, n_mics);
-[noise, fs] = audioread("MonitorNoiseAudio\audio_noisy\MO202501-WQB4BVWP-20211017-193500-MULTICHANNEL_SNRpri_-12dB.flac");
+[noise, fs] = audioread("Temporary/SNR_-15.wav", [1 100000]);
 for i = 1:n_mics
     for j = i:n_mics  % Symmetric matrix, compute half and mirror
         [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
         f_index = round(f_sound/(fs/2)*numel(f));
         Phi_NN(i,j) = cpsd_ij(f_index);
-        Phi_NN(j,i) = Phi_NN(i,j);  % Mirror since matrix is Hermitian
+        [cpsd_ji, f] = cpsd(noise(:,j), noise(:,i), [], [], [], fs);
+        f_index = round(f_sound/(fs/2)*numel(f));
+        Phi_NN(j,i) = cpsd_ji(f_index);
     end
 end
 Phi_NN_inv = inv(Phi_NN);  % Compute the inverse of the noise covariance matrix
@@ -86,7 +88,7 @@ for i = 1:6
 end
 
 % Sound and system parameters
-f_sound = 4000; % sound frequency for beamforming
+f_sound = 2000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -135,7 +137,9 @@ for elevation_deg = elevation_range
             [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
             f_index = round(f_sound/(fs/2)*numel(f));
             Phi_NN(i,j) = cpsd_ij(f_index);
-            Phi_NN(j,i) = Phi_NN(i,j);  % Mirror since matrix is Hermitian
+            [cpsd_ji, f] = cpsd(noise(:,j), noise(:,i), [], [], [], fs);
+            f_index = round(f_sound/(fs/2)*numel(f));
+            Phi_NN(j,i) = cpsd_ji(f_index);
         end
     end
     Phi_NN_inv = inv(Phi_NN);  % Compute the inverse of the noise covariance matrix
@@ -168,7 +172,7 @@ for elevation_deg = elevation_range
 
     polarplot(sound_delay_angles, mag2db(abs(simulations)), 'LineWidth', 2);
     hold on;
-    polarplot(sound_delay_angles, steering_direction, 'LineWidth', 2)%;
+    polarplot(sound_delay_angles, steering_direction, 'LineWidth', 2);
     hold off;
     thetalim([0 360]);
     thetaticks(0:45:315);
