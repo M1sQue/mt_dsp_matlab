@@ -62,10 +62,11 @@ for i = 1:numFreq
 end
 
 % simulation polar plot
-threshold = -40;
+H_threshold = max(max(mag2db(abs(simulations))));
+L_threshold = H_threshold - 20;
 simulations_dB = 20 * log10(abs(simulations));
-under_threshold_indices = simulations_dB < threshold;
-simulations_dB(under_threshold_indices) = threshold;
+under_threshold_indices = simulations_dB < L_threshold;
+simulations_dB(under_threshold_indices) = L_threshold;
 
 tbl = array2table([sound_delay_angles' simulations_dB']);
 tbl = renamevars(tbl, "Var1", "Angles (rad)");
@@ -80,8 +81,8 @@ legend;
 
 thetalim([0 360]);
 thetaticks(0:45:315);
-rlim([threshold 0]);
-rticks(threshold:5:0);
+rlim([L_threshold H_threshold]);
+rticks(L_threshold:5:H_threshold);
 title(sprintf("Kaiser Window with 6 channel avg directivity patterns \n azimuth %d°, elevation %d°", azimuth_deg, elevation_deg));
 
 %
@@ -158,12 +159,13 @@ for elevation_deg = elevation_range
     end
     
     % simulation polar plot
-    threshold = -60;
+    H_threshold = max(max(mag2db(abs(simulations))));
+    L_threshold = H_threshold - 20;
     simulations_dB = 20 * log10(abs(simulations));
-    under_threshold_indices = simulations_dB < threshold;
-    simulations_dB(under_threshold_indices) = threshold;
+    under_threshold_indices = simulations_dB < L_threshold;
+    simulations_dB(under_threshold_indices) = L_threshold;
     
-    steering_direction = threshold*ones(1,numel(sound_delay_angles));
+    steering_direction = L_threshold*ones(1,numel(sound_delay_angles));
     steering_index = mod(round(elevation_deg/5)+72,73)+1;
     steering_direction(steering_index) = 0; %direction of elevation_deg
     
@@ -181,8 +183,8 @@ for elevation_deg = elevation_range
     
     thetalim([0 360]);
     thetaticks(0:45:315);
-    rlim([threshold 0]);
-    rticks(threshold:5:0);
+    rlim([L_threshold H_threshold]);
+    rticks(L_threshold:5:H_threshold);
     title(sprintf("Kaiser Window with 6 channel avg directivity patterns \n azimuth %d°, elevation %d°", azimuth_deg, elevation_deg));
     drawnow;
 end;
