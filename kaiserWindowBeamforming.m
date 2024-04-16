@@ -163,13 +163,19 @@ for elevation_deg = elevation_range
     under_threshold_indices = simulations_dB < threshold;
     simulations_dB(under_threshold_indices) = threshold;
     
-    tbl = array2table([sound_delay_angles' simulations_dB']);
+    steering_direction = threshold*ones(1,numel(sound_delay_angles));
+    steering_index = mod(round(elevation_deg/5)+72,73)+1;
+    steering_direction(steering_index) = 0; %direction of elevation_deg
+    
+    tbl = array2table([sound_delay_angles' simulations_dB' steering_direction']);
     tbl = renamevars(tbl, "Var1", "Angles (rad)");
     polar_freq_labels = string(f_sound);
     for i = 1:numFreq
         polar_freq_labels(i) = sprintf("%dHz",f_sound(i));
         tbl = renamevars(tbl, sprintf("Var%d",i+1), sprintf("%dHz",f_sound(i)));
     end
+    tbl = renamevars(tbl, sprintf("Var%d",numFreq+2), "desired direction");
+    polar_freq_labels = [polar_freq_labels "desired direction"];
     polarplot(tbl, "Angles (rad)", polar_freq_labels, 'Linewidth', 1);
     legend;
     
