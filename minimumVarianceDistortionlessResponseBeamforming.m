@@ -61,17 +61,18 @@ sound_delays = -sound_delay_positions*m_pos/c; % to simulate the propagation: wi
 simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays).*sys).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
 
 % simulation polar plot
-threshold = -60;
+H_threshold = max(mag2db(abs(simulations)));
+L_threshold = H_threshold - 20;
 for i = 1:numel(sound_delay_angles)
-    if mag2db(abs(simulations(i))) < threshold
-        simulations(i) = 10^(threshold/20);
+    if mag2db(abs(simulations(i))) < L_threshold
+        simulations(i) = db2mag(L_threshold);
     end
 end
 polarplot(sound_delay_angles, mag2db(abs(simulations)));
 thetalim([0 360]);
 thetaticks(0:45:315);
-rlim([threshold 0]);
-rticks(threshold:5:0);
+rlim([L_threshold H_threshold]);
+rticks(L_threshold:5:H_threshold);
 title(sprintf("azimuth %d°, elevation %d°, frequency %dHz", azimuth_deg, elevation_deg, f_sound));
 
 %% animation
@@ -148,12 +149,18 @@ for elevation_deg = elevation_range
     simulations = w_mvdr*(exp(-1j*2*pi*f_sound*sound_delays)).';
 
     % Plotting
-    threshold = -40;
+    H_threshold = max(mag2db(abs(simulations)));
+    L_threshold = H_threshold - 20;
+    for i = 1:numel(sound_delay_angles)
+        if mag2db(abs(simulations(i))) < L_threshold
+            simulations(i) = db2mag(L_threshold);
+        end
+    end
     polarplot(sound_delay_angles, mag2db(abs(simulations)), 'LineWidth', 2);
     thetalim([0 360]);
     thetaticks(0:45:315);
-    rlim([threshold 0]);
-    rticks(threshold:10:0);
+    rlim([L_threshold H_threshold]);
+    rticks(L_threshold:10:H_threshold);
     title(sprintf("Azimuth %d°, Elevation %d°, Frequency %dHz", azimuth_deg, elevation_deg, f_sound));
     drawnow;
 
