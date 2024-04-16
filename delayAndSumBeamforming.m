@@ -7,7 +7,7 @@ for i = 1:6
 end
 
 f_sound = 1000; % sound frequency for beamforming
-r = 0.1; % coordinate unit length
+r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
 % microphone system parameters definition
@@ -29,7 +29,7 @@ azimuth_deg = 0;
 elevation_deg = -45;
 azimuth = deg2rad(azimuth_deg);
 elevation = deg2rad(elevation_deg);
-s_pos = 10*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
+s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
 
 % delay and sum algorithm
 dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
@@ -65,7 +65,7 @@ for i = 1:6
 end
 
 f_sound = polar_freq; % sound frequency for beamforming
-r = 0.1; % coordinate unit length
+r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
 % microphone system parameters definition
@@ -81,10 +81,10 @@ end
 
 % sound source parameters definition
 azimuth_deg = 0;
-elevation_deg = -45;
+elevation_deg = -90;
 azimuth = deg2rad(azimuth_deg);
 elevation = deg2rad(elevation_deg);
-s_pos = [cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
+s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
 
 % delay and sum algorithm
 dasb_delay = s_pos*m_pos/norm(s_pos)/c;
