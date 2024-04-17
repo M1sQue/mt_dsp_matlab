@@ -44,10 +44,10 @@ Phi_NN = ones(n_mics, n_mics);
 for i = 1:n_mics
     for j = i:n_mics  % Symmetric matrix, compute half and mirror
         [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
-        f_index = round(f_sound/(fs/2)*numel(f));
+        f_index = compareIndex(f_sound,fs,f);
         Phi_NN(i,j) = cpsd_ij(f_index);
         [cpsd_ji, f] = cpsd(noise(:,j), noise(:,i), [], [], [], fs);
-        f_index = round(f_sound/(fs/2)*numel(f));
+        f_index = compareIndex(f_sound,fs,f);
         Phi_NN(j,i) = cpsd_ji(f_index);
     end
 end
@@ -88,7 +88,7 @@ for i = 1:6
 end
 
 % Sound and system parameters
-f_sound = 2000; % sound frequency for beamforming
+f_sound = 4000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -135,10 +135,10 @@ for elevation_deg = elevation_range
     for i = 1:n_mics
         for j = i:n_mics  % Symmetric matrix, compute half and mirror
             [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
-            f_index = round(f_sound/(fs/2)*numel(f));
+            f_index = compareIndex(f_sound,fs,f);
             Phi_NN(i,j) = cpsd_ij(f_index);
             [cpsd_ji, f] = cpsd(noise(:,j), noise(:,i), [], [], [], fs);
-            f_index = round(f_sound/(fs/2)*numel(f));
+            f_index = compareIndex(f_sound,fs,f);
             Phi_NN(j,i) = cpsd_ji(f_index);
         end
     end
@@ -163,7 +163,7 @@ for elevation_deg = elevation_range
         end
     end
     steering_direction = L_threshold*ones(1,numel(sound_delay_angles));
-    if elevation_deg <= 0
+    if elevation_deg <= 0   
         steering_index = mod(round(elevation_deg/5)+72,73)+1;
     else 
         steering_index = mod(round(elevation_deg/5)+73,73)+1;
