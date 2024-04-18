@@ -10,6 +10,7 @@ fft_data = cell(1, num_angles);
 polar_freq = [500 1000 2000 4000 8000];
 num_polar_freq = length(polar_freq);
 polars = zeros(num_polar_freq, num_angles);
+Zs = zeros(num_polar_freq, num_angles);
 
 figure;
 channel = 1;
@@ -22,10 +23,12 @@ for i = 1:num_angles
     freq = (1:N)*(fs/N);
     freq = freq(1:N/2);
     fft_data{i} = fft(ir_data{i});
-    magnitude = mag2db(abs(fft_data{1, i}(1:N/2)));
+    Z = fft_data{1, i}(1:N/2);
+    magnitude = mag2db(abs(Z));
     for j = 1:num_polar_freq
         index = 1+mod(i-1+270/step,360/step);
         polars(j, index) = magnitude(polar_freq(j)*N/fs);
+        Zs(j, index) = Z(polar_freq(j)*N/fs);
     end
     plot(freq, magnitude);
 end
@@ -38,6 +41,7 @@ title(sprintf("FFTs for Channel %d", channel));
 figure;
 angles = [angles 360];
 polars = [polars polars(:,1)];
+Zs = [Zs Zs(:,1)];
 maxMag = max(polars(:));
 polars = polars-maxMag*ones(numel(polars(:,1)), numel(polars(1,:)));
 tbl = array2table([deg2rad(angles') polars']);
@@ -56,7 +60,7 @@ rlim([-60 0]);
 rticks(-60:5:0);
 title(sprintf("Directivity Pattern for Channel %d", channel));
 
-save("MatData/polars", "polars", "polar_freq");
+save("MatData/polars.mat", "Zs", "polar_freq");
 
 %% mean directivity pattern
 clear;
@@ -70,6 +74,7 @@ fft_data = cell(1, num_angles);
 polar_freq = [500 1000 2000 4000 8000];
 num_polar_freq = length(polar_freq);
 polars = zeros(num_polar_freq, num_angles);
+Zs = zeros(num_polar_freq, num_angles);
 
 monName = ["monCQGLL74L" "monG7SMCCBW" "monKD8N255G" "monGHHX" "mon99PJ"];
 channel = 6;
@@ -80,14 +85,17 @@ for k = 1:5
         [ir_data{i}, fs] = audioread(filename);
         N = length(ir_data{i});
         fft_data{i} = fft(ir_data{i});
-        magnitude = abs(fft_data{1, i}(1:N/2));
+        Z = fft_data{1, i}(1:N/2);
+        magnitude = abs(Z);
         for j = 1:num_polar_freq
             index = 1+mod(i-1+270/step,360/step);
             polars(j, index) = polars(j, index)+magnitude(polar_freq(j)*N/fs);
+            Zs(j, index) = Zs(j, index)+Z(polar_freq(j)*N/fs);
         end
     end
 end
 polars = polars/5;
+Zs = Zs/5;
 polars = mag2db(polars);
 maxMag = max(polars(:));
 polars = polars-maxMag*ones(numel(polars(:,1)), numel(polars(1,:)));
@@ -95,6 +103,7 @@ polars = polars-maxMag*ones(numel(polars(:,1)), numel(polars(1,:)));
 figure;
 angles = [angles 360];
 polars = [polars polars(:,1)];
+Zs = [Zs Zs(:,1)];
 tbl = array2table([deg2rad(angles') polars']);
 tbl = renamevars(tbl, "Var1", "Angles (rad)");
 polar_freq_labels = string(polar_freq);
@@ -111,4 +120,4 @@ rlim([-60 0]);
 rticks(-60:5:0);
 title(sprintf("Average Directivity Pattern for Channel %d", channel));
 
-save(sprintf("MatData/polars_average_channel_%d", channel), "polars", "polar_freq");
+save(sprintf("MatData/polars_average_channel_%d", channel), "Zs", "polar_freq");

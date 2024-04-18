@@ -3,10 +3,10 @@ clear;
 polars_cell = cell(1,6);
 for i = 1:6
     load(sprintf("MatData/polars_average_channel_%d.mat", i));
-    polars_cell{i} = polars;
+    polars_cell{i} = Zs;
 end
 
-f_sound = 1000; % sound frequency for beamforming
+f_sound = 4000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -40,17 +40,18 @@ w_dasb = d_dasb;
 sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
 sound_delays = -sound_delay_positions*m_pos/c; % to simulate the propagation: with "-"
-simulations = w_dasb*(exp(-1j*2*pi*f_sound*sound_delays).*sys).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
+simulations = (exp(-1j*2*pi*f_sound*sound_delays).*sys).';
+output = w_dasb*simulations; % to simulate signals from all directions: with "-"; do NOT use Hermitian
 
 % simulation polar plot
-H_threshold = max(mag2db(abs(simulations)));
+H_threshold = max(mag2db(abs(output)));
 L_threshold = H_threshold - 20;
 for i = 1:numel(sound_delay_angles)
-    if mag2db(abs(simulations(i))) < L_threshold
-        simulations(i) = db2mag(L_threshold);
+    if mag2db(abs(output(i))) < L_threshold
+        output(i) = db2mag(L_threshold);
     end
 end
-polarplot(sound_delay_angles, mag2db(abs(simulations)));
+polarplot(sound_delay_angles, mag2db(abs(output)));
 thetalim([0 360]);
 thetaticks(0:45:315);
 rlim([L_threshold H_threshold]);
@@ -63,7 +64,7 @@ clear;
 polars_cell = cell(1,6);
 for i = 1:6
     load(sprintf("MatData/polars_average_channel_%d.mat", i));
-    polars_cell{i} = polars;
+    polars_cell{i} = Zs;
 end
 
 % Sound and system parameters
@@ -109,15 +110,15 @@ for elevation_deg = elevation_range
     sound_delay_angles = deg2rad(0:5:360);
     sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
     sound_delays = -sound_delay_positions*m_pos/c;
-    % simulations = w_dasb*(exp(-1j*2*pi*f_sound*sound_delays).*sys).';
-    simulations = w_dasb*(exp(-1j*2*pi*f_sound*sound_delays)).';
+    simulations = (exp(-1j*2*pi*f_sound*sound_delays).*sys).';
+    output = w_dasb*simulations;
 
     % Plotting
-    H_threshold = max(mag2db(abs(simulations)));
+    H_threshold = max(mag2db(abs(output)));
     L_threshold = H_threshold - 10;
     for i = 1:numel(sound_delay_angles)
-        if mag2db(abs(simulations(i))) < L_threshold
-            simulations(i) = db2mag(L_threshold);
+        if mag2db(abs(output(i))) < L_threshold
+            output(i) = db2mag(L_threshold);
         end
     end
     steering_direction = L_threshold*ones(1,numel(sound_delay_angles));
@@ -128,7 +129,7 @@ for elevation_deg = elevation_range
     end
     steering_direction(steering_index) = 0; %direction of elevation_deg
     
-    polarplot(sound_delay_angles, mag2db(abs(simulations)), 'LineWidth', 2);
+    polarplot(sound_delay_angles, mag2db(abs(output)), 'LineWidth', 2);
     hold on;
     polarplot(sound_delay_angles, steering_direction, 'LineWidth', 2);
     hold off;
