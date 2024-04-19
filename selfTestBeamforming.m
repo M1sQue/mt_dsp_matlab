@@ -3,7 +3,7 @@ clear;
 polars_cell = cell(1,6);
 for i = 1:6
     load(sprintf("MatData/polars_average_channel_%d.mat", i));
-    polars_cell{i} = Zs;
+    polars_cell{i} = polars;
 end
 
 f_sound = 4000; % sound frequency for beamforming
@@ -64,7 +64,7 @@ clear;
 polars_cell = cell(1,6);
 for i = 1:6
     load(sprintf("MatData/polars_average_channel_%d.mat", i));
-    polars_cell{i} = Zs;
+    polars_cell{i} = polars;
 end
 
 % Sound and system parameters

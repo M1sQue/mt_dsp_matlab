@@ -60,7 +60,7 @@ rlim([-60 0]);
 rticks(-60:5:0);
 title(sprintf("Directivity Pattern for Channel %d", channel));
 
-save("MatData/polars.mat", "Zs", "polar_freq");
+save("MatData/polars.mat", "polars", "polar_freq");
 
 %% mean directivity pattern
 clear;
@@ -77,7 +77,7 @@ polars = zeros(num_polar_freq, num_angles);
 Zs = zeros(num_polar_freq, num_angles);
 
 monName = ["monCQGLL74L" "monG7SMCCBW" "monKD8N255G" "monGHHX" "mon99PJ"];
-channel = 6;
+channel = 1;
 for k = 1:5
     for i = 1:num_angles
         %filename = sprintf("Microphone_Impulse_Responses/ShureSM58_125cm_Normalised_IRs/IRs/ShureSM58_125cm_%dDeg.wav", angles(i));
@@ -120,4 +120,4 @@ rlim([-60 0]);
 rticks(-60:5:0);
 title(sprintf("Average Directivity Pattern for Channel %d", channel));
 
-save(sprintf("MatData/polars_average_channel_%d", channel), "Zs", "polar_freq");
+save(sprintf("MatData/polars_average_channel_%d", channel), "polars", "polar_freq");
