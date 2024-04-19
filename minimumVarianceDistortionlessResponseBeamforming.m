@@ -40,7 +40,7 @@ w_dasb = d_dasb;
 d_mvdr = d_dasb.';
 n_mics = numel(m_pos(1,:));
 Phi_NN = ones(n_mics, n_mics);
-[noise, fs] = audioread("Temporary/SNR_-15.wav", [1 100000]);
+[noise, fs] = audioread("Temporary/SNR_-15_pure_noise.wav", [1 100000]);
 for i = 1:n_mics
     for j = i:n_mics  % Symmetric matrix, compute half and mirror
         [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
@@ -88,7 +88,7 @@ for i = 1:6
 end
 
 % Sound and system parameters
-f_sound = 4000; % sound frequency for beamforming
+f_sound = 1000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -110,7 +110,7 @@ end
 sys = [polars_cell{1}(temp, :); polars_cell{2}(temp, :); polars_cell{3}(temp, :); polars_cell{4}(temp, :); polars_cell{5}(temp, :); polars_cell{6}(temp, :)]';
 sys = db2mag(sys);
 
-elevation_range = -180:5:180; % Range of elevation angles
+elevation_range = -180:10:180; % Range of elevation angles
 % Initialize video writer
 % v = VideoWriter('polar_animation.avi');
 % open(v);
@@ -131,7 +131,7 @@ for elevation_deg = elevation_range
     d_mvdr = d_dasb.';
     n_mics = numel(m_pos(1,:));
     Phi_NN = ones(n_mics, n_mics);
-    [noise, fs] = audioread("Temporary/SNR_-15.wav", [1 100000]);
+    [noise, fs] = audioread("Temporary/SNR_-15_pure_noise.wav", [1 100000]);
     for i = 1:n_mics
         for j = i:n_mics  % Symmetric matrix, compute half and mirror
             [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
