@@ -44,7 +44,7 @@ for i = 1:6
     end
 end
 
-%% fix rotation of monitor 99PJ
+%% fix rotation of monitor 99PJ, 180 degrees
 c = 343.3;
 delay_diff = (sqrt(5)-1)/c;
 fix = [3 3 3 -3 -3 -3];
@@ -65,8 +65,8 @@ for i = 1:6
     end
 end
 
-%% fix rotation of any audio
-[noise, fs] = audioread("Temporary\SNR_-15.wav");
+%% fix rotation of any audio, 180 degrees
+[noise, fs] = audioread("Temporary\SNR_0.wav");
 noise_copy = noise;
 
 noise(:,1) = noise_copy(:, 4);
@@ -76,4 +76,4 @@ noise(:,4) = noise_copy(:, 1);
 noise(:,5) = noise_copy(:, 2);
 noise(:,6) = noise_copy(:, 3);
 
-audiowrite("Temporary\SNR_-15_switched_channel.wav", noise_copy, fs);
+audiowrite("Temporary\SNR_0_switched_channel.wav", noise, fs);
