@@ -5,7 +5,7 @@ for i = 1:6
     polars_cell{i} = polars;
 end
 
-f_sound = 4000; % sound frequency for beamforming
+f_sound = 1000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -23,21 +23,16 @@ end
 sys = [polars_cell{1}(temp, :); polars_cell{2}(temp, :); polars_cell{3}(temp, :); polars_cell{4}(temp, :); polars_cell{5}(temp, :); polars_cell{6}(temp, :)]';
 sys = db2mag(sys);
 
-% sound source parameters definition
-azimuth_deg = 0;
-elevation_deg = -90;
-azimuth = deg2rad(azimuth_deg);
-elevation = deg2rad(elevation_deg);
-s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
-
 % mwf algorithm
-[noiseOnly, fs_noiseOnly] = audioread("Temporary/SNR_-15_pure_noise.wav", [1 200000]);
-[targetPlusNoise, fs_targetPlusNoise]= audioread("Temporary/SNR_-15.wav", [1 200000]);
+[noiseOnly, fs_noiseOnly] = audioread("Temporary/SNR_-15_pure_noise.wav");
+[target, fs_target]= audioread("Temporary/SNR_15.wav");
+[targetPlusNoise, fs_targetPlusNoise]= audioread("Temporary/SNR_-15.wav");
 n_mics = numel(m_pos(1,:));
 P_NN = ones(n_mics, n_mics);
 P_XX = ones(n_mics, n_mics);
+P_YY = ones(n_mics, n_mics);
 for i = 1:n_mics
-    for j = i:n_mics  % Symmetric matrix, compute half and mirror
+    for j = i:n_mics
         [cpsd_ij, f] = cpsd(noiseOnly(:,i), noiseOnly(:,j), [], [], [], fs_noiseOnly);
         f_index = compareIndex(f_sound,fs_noiseOnly,f);
         P_NN(i,j) = cpsd_ij(f_index);
@@ -47,16 +42,28 @@ for i = 1:n_mics
     end
 end
 for i = 1:n_mics
-    for j = i:n_mics  % Symmetric matrix, compute half and mirror
-        [cpsd_ij, f] = cpsd(targetPlusNoise(:,i), targetPlusNoise(:,j), [], [], [], fs_targetPlusNoise);
-        f_index = compareIndex(f_sound,fs_targetPlusNoise,f);
+    for j = i:n_mics
+        [cpsd_ij, f] = cpsd(target(:,i), target(:,j), [], [], [], fs_target);
+        f_index = compareIndex(f_sound,fs_target,f);
         P_XX(i,j) = cpsd_ij(f_index);
-        [cpsd_ji, f] = cpsd(targetPlusNoise(:,j), targetPlusNoise(:,i), [], [], [], fs_targetPlusNoise);
-        f_index = compareIndex(f_sound,fs_targetPlusNoise,f);
+        [cpsd_ji, f] = cpsd(target(:,j), target(:,i), [], [], [], fs_target);
+        f_index = compareIndex(f_sound,fs_target,f);
         P_XX(j,i) = cpsd_ji(f_index);
     end
 end
+for i = 1:n_mics
+    for j = i:n_mics
+        [cpsd_ij, f] = cpsd(targetPlusNoise(:,i), targetPlusNoise(:,j), [], [], [], fs_targetPlusNoise);
+        f_index = compareIndex(f_sound,fs_targetPlusNoise,f);
+        P_YY(i,j) = cpsd_ij(f_index);
+        [cpsd_ji, f] = cpsd(targetPlusNoise(:,j), targetPlusNoise(:,i), [], [], [], fs_targetPlusNoise);
+        f_index = compareIndex(f_sound,fs_targetPlusNoise,f);
+        P_YY(j,i) = cpsd_ji(f_index);
+    end
+end
 w_mwf = P_XX/(P_XX+P_NN);
+% w_mwf = (P_YY-P_NN)/P_YY;
+% w_mwf = P_XX/P_YY;
 for i = 1:numel(w_mwf(:,1))
     w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
 end
@@ -71,7 +78,7 @@ simulations = w_mwf*(exp(-1j*2*pi*f_sound*sound_delays)).'; % to simulate signal
 figure;
 for i = 1:numel(simulations(:,1))
     subplot(2, 3, i);
-    H_threshold = 0;
+    H_threshold = max(mag2db(abs(simulations(i,:))));
     L_threshold = H_threshold - 20;
     for j = 1:numel(sound_delay_angles)
         if mag2db(abs(simulations(i, j))) < L_threshold
