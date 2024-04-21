@@ -6,7 +6,7 @@ for i = 1:6
     polars_cell{i} = polars;
 end
 
-f_sound = 1000; % sound frequency for beamforming
+f_sound = 4000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -30,12 +30,12 @@ azimuth = deg2rad(azimuth_deg);
 
 % mwf algorithm
 [N, fs_noiseOnly] = audioread("Temporary/SNR_-15_pure_noise.wav");
-[X, fs_target]= audioread("Temporary/SNR_15.wav");
-% [Y, fs_targetPlusNoise]= audioread("Temporary/SNR_0.wav");
+% [X, fs_target]= audioread("Temporary/SNR_15.wav");
+[Y, fs_targetPlusNoise]= audioread("Temporary/SNR_0.wav");
 n_mics = numel(m_pos(1,:));
 P_NN = ones(n_mics, n_mics);
-P_XX = ones(n_mics, n_mics);
-% P_YY = ones(n_mics, n_mics);
+% P_XX = ones(n_mics, n_mics);
+P_YY = ones(n_mics, n_mics);
 for i = 1:n_mics
     for j = i:n_mics
         [cpsd_ij, f] = cpsd(N(:,i), N(:,j), [], [], [], fs_noiseOnly);
@@ -46,31 +46,31 @@ for i = 1:n_mics
         P_NN(j,i) = cpsd_ji(f_index);
     end
 end
-for i = 1:n_mics
-    for j = i:n_mics
-        [cpsd_ij, f] = cpsd(X(:,i), X(:,j), [], [], [], fs_target);
-        f_index = compareIndex(f_sound,fs_target,f);
-        P_XX(i,j) = cpsd_ij(f_index);
-        [cpsd_ji, f] = cpsd(X(:,j), X(:,i), [], [], [], fs_target);
-        f_index = compareIndex(f_sound,fs_target,f);
-        P_XX(j,i) = cpsd_ji(f_index);
-    end
-end
 % for i = 1:n_mics
 %     for j = i:n_mics
-%         [cpsd_ij, f] = cpsd(Y(:,i), Y(:,j), [], [], [], fs_targetPlusNoise);
-%         f_index = compareIndex(f_sound,fs_targetPlusNoise,f);
-%         P_YY(i,j) = cpsd_ij(f_index);
-%         [cpsd_ji, f] = cpsd(Y(:,j), Y(:,i), [], [], [], fs_targetPlusNoise);
-%         f_index = compareIndex(f_sound,fs_targetPlusNoise,f);
-%         P_YY(j,i) = cpsd_ji(f_index);
+%         [cpsd_ij, f] = cpsd(X(:,i), X(:,j), [], [], [], fs_target);
+%         f_index = compareIndex(f_sound,fs_target,f);
+%         P_XX(i,j) = cpsd_ij(f_index);
+%         [cpsd_ji, f] = cpsd(X(:,j), X(:,i), [], [], [], fs_target);
+%         f_index = compareIndex(f_sound,fs_target,f);
+%         P_XX(j,i) = cpsd_ji(f_index);
 %     end
 % end
-w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
-% w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
-% for i = 1:numel(w_mwf(:,1))
-%     w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
-% end
+for i = 1:n_mics
+    for j = i:n_mics
+        [cpsd_ij, f] = cpsd(Y(:,i), Y(:,j), [], [], [], fs_targetPlusNoise);
+        f_index = compareIndex(f_sound,fs_targetPlusNoise,f);
+        P_YY(i,j) = cpsd_ij(f_index);
+        [cpsd_ji, f] = cpsd(Y(:,j), Y(:,i), [], [], [], fs_targetPlusNoise);
+        f_index = compareIndex(f_sound,fs_targetPlusNoise,f);
+        P_YY(j,i) = cpsd_ji(f_index);
+    end
+end
+% w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
+w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
+for i = 1:numel(w_mwf(:,1))
+    w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
+end
 
 % simulation parameters
 sound_delay_angles = deg2rad(0:5:360);
@@ -96,12 +96,11 @@ for i = 1:numel(simulations(:,1))
     rticks(L_threshold:5:H_threshold);
     title(sprintf("channel %d, frequency %dHz", i, f_sound));
 end
-save("w_mwf.mat", "w_mwf");
 
 %% only calculate coefficients
 clear;
 
-f_sound_group = [200 300 500 800 1000 1200 1500 1800 2000 2500 3000 4000 5000 7000 8500]; % sound frequency for beamforming
+f_sound_group = 100:200:8000; % sound frequency for beamforming
 c = 343.3; % speed of sound
 W_MWF = cell(1, length(f_sound_group));
 
@@ -110,9 +109,9 @@ azimuth_deg = 0;
 azimuth = deg2rad(azimuth_deg);
 
 % mwf algorithm
-[N, fs_noiseOnly] = audioread("Temporary/SNR_-15_pure_noise.wav");
+[N, fs_noiseOnly] = audioread("Temporary/SNR_0_pure_noise.wav");
 [X, fs_target]= audioread("Temporary/SNR_15.wav");
-% [Y, fs_targetPlusNoise]= audioread("Temporary/SNR_0.wav");
+% [Y, fs_targetPlusNoise]= audioread("Temporary/SNR_-15.wav");
 n_mics = numel(N(1, :));
 
 for k = 1:length(f_sound_group)
@@ -152,9 +151,9 @@ for k = 1:length(f_sound_group)
 %     end
     w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
 %     w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
-%     for i = 1:numel(w_mwf(:,1))
-%         w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
-%     end
+    for i = 1:numel(w_mwf(:,1))
+        w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
+    end
     
     W_MWF{k} = w_mwf;
 end
