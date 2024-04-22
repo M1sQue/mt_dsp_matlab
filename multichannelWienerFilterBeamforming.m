@@ -93,8 +93,7 @@ for k = 1:length(f_sound_group)
 %     w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
     for i = 1:numel(w_mwf(:,1))
         w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
-    end
-    
+    end 
     W_MWF{k} = w_mwf;
 end
 

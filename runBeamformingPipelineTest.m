@@ -2,13 +2,13 @@ clear;
 load("MatData/w_mwf.mat");
 
 % input time domain
-[input_t, fs_input] = audioread("Temporary/SNR_-15.wav");
+[input_t, fs_input] = audioread("Temporary/MO202501-WQB4BVWP-20211117-023500-MULTICHANNEL.flac");
 % STFT parameters
 N_STFT = 512;
 R_STFT = N_STFT/2;
 win = sqrt(hann(N_STFT,'periodic'));
 % spectogram figure settings
-xTickProp = [0, fs_input/R_STFT, 0]; % R_STFT/fs_input fs_input/R_STFT
+xTickProp = [0, R_STFT/fs_input, 0]; % R_STFT/fs_input, fs_input/R_STFT
 yTickProp = [0, fs_input/(2000*R_STFT), R_STFT/2];
 cRange    = [-45 15];
 % plot input
