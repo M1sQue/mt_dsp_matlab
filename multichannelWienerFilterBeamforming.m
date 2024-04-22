@@ -98,5 +98,6 @@ for k = 1:length(f_sound_group)
     W_MWF{k} = w_mwf;
 end
 
-save("MatData/w_mwf.mat", "W_MWF", "f_sound_group");
+flag = 6;
+save("MatData/w_mwf.mat", "W_MWF", "f_sound_group", "flag");
 disp("Job done");

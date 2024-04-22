@@ -203,5 +203,6 @@ for k = 1:length(f_sound_group)
     W_MVDR{k} = w_mvdr;
 end
 
-save("MatData/w_mvdr.mat", "W_MVDR", "f_sound_group");
+flag = 1;
+save("MatData/w_mvdr.mat", "W_MVDR", "f_sound_group", "flag");
 disp("Job done");

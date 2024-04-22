@@ -1,8 +1,8 @@
 clear;
-load("MatData/w_mwf.mat");
+load("MatData/w_mvdr.mat");
 
 % input time domain
-[input_t, fs_input] = audioread("Temporary/SNR_0.wav");
+[input_t, fs_input] = audioread("Temporary/SNR_-15.wav");
 % STFT parameters
 N_STFT = 512;
 R_STFT = N_STFT/2;
@@ -19,9 +19,9 @@ for i = 1:iterations
     subplot (iterations, 1, i);
     plotSpec(input_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('f/kHz');
 end
-output_stft = zeros(size(input_stft));
+output_stft = zeros(numel(input_stft(:,1,1)), numel(input_stft(1,:,1)), flag);
 
-% mwf coefficients
+% filter coefficients
 f_start = 0;
 f_end = 0;
 frame_len = numel(input_stft(:,1,1));
@@ -35,16 +35,16 @@ for i=1:numel(f_sound_group)
     end
     i_start = floor(f_start*frame_len/(fs_input/2)) +1;
     i_end = floor(f_end*frame_len/(fs_input/2));
-    w_mwf = W_MWF{i};
+    w_filter = W_MVDR{i};
     for j = 1:iterations
-        output_stft(i_start:i_end,j,:) = squeeze(input_stft(i_start:i_end,j,:)) * w_mwf.';
+        output_stft(i_start:i_end,j,:) = squeeze(input_stft(i_start:i_end,j,:)) * w_filter.';
     end
 end
 
 output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
 
 % plot output
-iterations = numel(input_stft(1,1,:));
+iterations = flag;
 figure;
 for i = 1:iterations
     subplot (iterations, 1, i);
