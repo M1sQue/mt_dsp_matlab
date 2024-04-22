@@ -39,18 +39,8 @@ w_dasb = d_dasb;
 % mvdr algorithm
 d_mvdr = d_dasb.';
 n_mics = numel(m_pos(1,:));
-Phi_NN = ones(n_mics, n_mics);
 [noise, fs] = audioread("Temporary/SNR_-15_pure_noise.wav", [1 100000]);
-for i = 1:n_mics
-    for j = i:n_mics
-        [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
-        f_index = compareIndex(f_sound,fs,f);
-        Phi_NN(i,j) = cpsd_ij(f_index);
-        [cpsd_ji, f] = cpsd(noise(:,j), noise(:,i), [], [], [], fs);
-        f_index = compareIndex(f_sound,fs,f);
-        Phi_NN(j,i) = cpsd_ji(f_index);
-    end
-end
+Phi_NN = calculateCPSD(noise, noise, n_mics, fs, f_sound);
 Phi_NN_inv = inv(Phi_NN);
 w_mvdr = (Phi_NN_inv*d_mvdr/(d_mvdr'*Phi_NN_inv*d_mvdr)).';
 w_mvdr = w_mvdr/sum(abs(w_mvdr));
