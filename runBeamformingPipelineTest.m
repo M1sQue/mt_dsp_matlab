@@ -55,7 +55,7 @@ audiowrite("Temporary\00_current_test_result.wav", output_t, fs_input);
 
 %% calculate SNR
 N_in = audioread("Temporary/SNR_-15_pure_noise.wav");
-N_out = audioread("Temporary/result_noise_mvdr_SNR_-15.wav");
+N_out = audioread("Temporary/result_noise_SNR_-15_2.wav");
 noise_in_psd = pwelch(N_in);
 noise_out_psd = pwelch(N_out);
 y_psd = pwelch(input_t);

@@ -6,7 +6,7 @@ for i = 1:6
     polars_cell{i} = polars;
 end
 
-f_sound = 4000; % sound frequency for beamforming
+f_sound = 1000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 
@@ -30,14 +30,14 @@ azimuth = deg2rad(azimuth_deg);
 
 % mwf algorithm
 [N, fs_noiseOnly] = audioread("Temporary/SNR_-15_pure_noise.wav");
-% [X, fs_target]= audioread("Temporary/SNR_15.wav");
-[Y, fs_targetPlusNoise]= audioread("Temporary/SNR_0.wav");
+[X, fs_target]= audioread("Temporary/SNR_15.wav");
+% [Y, fs_targetPlusNoise]= audioread("Temporary/SNR_0_switched_channel.wav");
 n_mics = numel(m_pos(1,:));
 P_NN = calculateCPSD(N, N, n_mics, fs_noiseOnly, f_sound);
-% P_XX = calculateCPSD(X, X, n_mics, fs_target, f_sound);
-P_YY = calculateCPSD(Y, Y, n_mics, fs_targetPlusNoise, f_sound);
-% w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
-w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
+P_XX = calculateCPSD(X, X, n_mics, fs_target, f_sound);
+% P_YY = calculateCPSD(Y, Y, n_mics, fs_targetPlusNoise, f_sound);
+w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
+% w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
 for i = 1:numel(w_mwf(:,1))
     w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
 end
@@ -80,17 +80,17 @@ azimuth = deg2rad(azimuth_deg);
 
 % mwf algorithm
 [N, fs_noiseOnly] = audioread("Temporary/SNR_-15_pure_noise.wav");
-% [X, fs_target]= audioread("Temporary/SNR_15.wav");
-[Y, fs_targetPlusNoise]= audioread("Temporary/SNR_-15.wav");
+[X, fs_target]= audioread("Temporary/SNR_15.wav");
+% [Y, fs_targetPlusNoise]= audioread("Temporary/SNR_0_switched_channel.wav");
 n_mics = numel(N(1, :));
 
 for k = 1:length(f_sound_group)
     f_sound = f_sound_group(k);
     P_NN = calculateCPSD(N, N, n_mics, fs_noiseOnly, f_sound);
-%     P_XX = calculateCPSD(X, X, n_mics, fs_target, f_sound);
-    P_YY = calculateCPSD(Y, Y, n_mics, fs_targetPlusNoise, f_sound);
-%     w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
-    w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
+    P_XX = calculateCPSD(X, X, n_mics, fs_target, f_sound);
+%     P_YY = calculateCPSD(Y, Y, n_mics, fs_targetPlusNoise, f_sound);
+    w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
+%     w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
     for i = 1:numel(w_mwf(:,1))
         w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
     end
