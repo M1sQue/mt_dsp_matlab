@@ -119,18 +119,8 @@ for elevation_deg = elevation_range
     % MVDR beamforming
     d_mvdr = d_dasb.';
     n_mics = numel(m_pos(1,:));
-    Phi_NN = ones(n_mics, n_mics);
     [noise, fs] = audioread("Temporary/SNR_-15_pure_noise.wav", [1 100000]);
-    for i = 1:n_mics
-        for j = i:n_mics
-            [cpsd_ij, f] = cpsd(noise(:,i), noise(:,j), [], [], [], fs);
-            f_index = compareIndex(f_sound,fs,f);
-            Phi_NN(i,j) = cpsd_ij(f_index);
-            [cpsd_ji, f] = cpsd(noise(:,j), noise(:,i), [], [], [], fs);
-            f_index = compareIndex(f_sound,fs,f);
-            Phi_NN(j,i) = cpsd_ji(f_index);
-        end
-    end
+    Phi_NN = calculateCPSD(noise, noise, n_mics, fs, f_sound);
     Phi_NN_inv = inv(Phi_NN);
     w_mvdr = (Phi_NN_inv*d_mvdr/(d_mvdr'*Phi_NN_inv*d_mvdr)).';
     w_mvdr = w_mvdr/sum(abs(w_mvdr));
@@ -176,3 +166,42 @@ end
 
 % Close the video file
 % close(v);
+
+%% only calculate coefficients
+clear;
+
+f_sound_group = 100:200:8000; % sound frequency for beamforming
+r = 0.057; % coordinate unit length
+c = 343.3; % speed of sound
+W_MVDR = cell(1, length(f_sound_group));
+
+% microphone system parameters definition
+m_pos = [r 0 0; r/2 -sqrt(3)/2*r 0; -r/2 -sqrt(3)/2*r 0; -r 0 0; -r/2 sqrt(3)/2*r 0; r/2 sqrt(3)/2*r 0]';
+
+% sound source parameters definition
+azimuth_deg = 0;
+elevation_deg = -90;
+azimuth = deg2rad(azimuth_deg);
+elevation = deg2rad(elevation_deg);
+s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
+
+% MVDR beamforming
+for k = 1:length(f_sound_group)
+    f_sound = f_sound_group(k);
+    % Delay and sum beamforming
+    dasb_delay = s_pos*m_pos/norm(s_pos)/c;
+    d_dasb = exp(-1j*2*pi*f_sound*dasb_delay)/numel(m_pos(1,:));
+    w_dasb = d_dasb;
+
+    d_mvdr = d_dasb.';
+    n_mics = numel(m_pos(1,:));
+    [noise, fs] = audioread("Temporary/SNR_-15_pure_noise.wav", [1 100000]);
+    Phi_NN = calculateCPSD(noise, noise, n_mics, fs, f_sound);
+    Phi_NN_inv = inv(Phi_NN);
+    w_mvdr = (Phi_NN_inv*d_mvdr/(d_mvdr'*Phi_NN_inv*d_mvdr)).';
+    w_mvdr = w_mvdr/sum(abs(w_mvdr));
+    W_MVDR{k} = w_mvdr;
+end
+
+save("MatData/w_mvdr.mat", "W_MVDR", "f_sound_group");
+disp("Job done");
