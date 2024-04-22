@@ -218,12 +218,11 @@ end
 %% only calculate coefficients
 clear;
 
-f_sound_group = 100:200:8000; % sound frequency for beamforming
+f_sound_group = 100:100:8000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
 % microphone system parameters definition
 m_pos = [r 0 0; r/2 -sqrt(3)/2*r 0; -r/2 -sqrt(3)/2*r 0; -r 0 0; -r/2 sqrt(3)/2*r 0; r/2 sqrt(3)/2*r 0]';
-
 
 % sound source parameters definition
 azimuth_deg = 0;
@@ -231,7 +230,6 @@ elevation_deg = -90;
 azimuth = deg2rad(azimuth_deg);
 elevation = deg2rad(elevation_deg);
 s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
-
 
 % delay and sum algorithm
 dasb_delay = s_pos*m_pos/norm(s_pos)/c;
@@ -242,6 +240,5 @@ for i=1:numel(d_dasb(:,1))
 end
 
 flag = 1;
-
 save("MatData/w_dasb.mat", "W_DASB", "f_sound_group", "flag");
 disp("Job done");

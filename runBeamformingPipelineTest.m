@@ -1,5 +1,5 @@
 clear;
-load("MatData/w_mvdr.mat");
+load("MatData/w_mwf.mat");
 
 % input time domain
 [input_t, fs_input] = audioread("Temporary/SNR_-15.wav");
@@ -35,7 +35,7 @@ for i=1:numel(f_sound_group)
     end
     i_start = floor(f_start*frame_len/(fs_input/2)) +1;
     i_end = floor(f_end*frame_len/(fs_input/2));
-    w_filter = W_MVDR{i};
+    w_filter = W_MWF{i};
     for j = 1:iterations
         output_stft(i_start:i_end,j,:) = squeeze(input_stft(i_start:i_end,j,:)) * w_filter.';
     end
@@ -55,7 +55,7 @@ audiowrite("Temporary\00_current_test_result.wav", output_t, fs_input);
 
 %% calculate SNR
 N_in = audioread("Temporary/SNR_-15_pure_noise.wav");
-N_out = audioread("Temporary/result_noise_SNR_-15.wav");
+N_out = audioread("Temporary/result_noise_mvdr_SNR_-15.wav");
 noise_in_psd = pwelch(N_in);
 noise_out_psd = pwelch(N_out);
 y_psd = pwelch(input_t);

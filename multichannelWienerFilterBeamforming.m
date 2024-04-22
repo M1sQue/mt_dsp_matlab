@@ -70,7 +70,7 @@ end
 %% only calculate coefficients
 clear;
 
-f_sound_group = 100:200:8000; % sound frequency for beamforming
+f_sound_group = 100:100:8000; % sound frequency for beamforming
 c = 343.3; % speed of sound
 W_MWF = cell(1, length(f_sound_group));
 
