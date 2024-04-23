@@ -1,8 +1,9 @@
+%% test results in frequency domain
 clear;
 load("MatData/w_mwf_00N02_00Y01.mat");
 
 % input time domain
-[input_t, fs_input] = audioread("Temporary/MO202501-WQB4BVWP-20211017-193500-MULTICHANNEL_SNRpri_-2dB.flac");
+[input_t, fs_input] = audioread("Temporary/MO223303-PCGWZGP9-20230117-071000-MULTICHANNEL.flac");
 % STFT parameters
 N_STFT = 512;
 R_STFT = N_STFT/2;
@@ -56,8 +57,8 @@ xlabel("Time");
 audiowrite("Temporary\00_current_test_result.wav", output_t, fs_input);
 
 %% calculate SNR
-N_in = audioread("Temporary/SNR_-15_pure_noise.wav");
-N_out = audioread("Temporary/result_noise_SNR_-15_2.wav");
+N_in = audioread("Temporary/zz_current_noise_in.flac");
+N_out = audioread("Temporary/zz_current_noise_out.wav");
 noise_in_psd = pwelch(N_in);
 noise_out_psd = pwelch(N_out);
 y_psd = pwelch(input_t);
@@ -70,3 +71,6 @@ disp(["input SNR: ",input_SNR]);
 signal_psd_out = mean(abs(x_hat_psd)) - mean(abs(noise_out_psd));
 output_SNR = 10*log10(sum(signal_psd_out)/sum(mean(abs(noise_out_psd))));
 disp(["output SNR: ",output_SNR]);
+
+%% test results in frequency domain
+

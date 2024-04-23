@@ -118,3 +118,6 @@ end
 flag = 6;
 save("MatData/w_mwf_00N02_00Y01.mat", "W_MWF", "f_sound_group", "flag");
 disp("Job done");
+
+%% time domain mwf
+
