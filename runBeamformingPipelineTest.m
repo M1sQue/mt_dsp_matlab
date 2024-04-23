@@ -1,8 +1,8 @@
 clear;
-load("MatData/w_mwf.mat");
+load("MatData/w_mwf_00N02_00Y01.mat");
 
 % input time domain
-[input_t, fs_input] = audioread("Temporary/MO202501-WQB4BVWP-20211117-023500-MULTICHANNEL.flac");
+[input_t, fs_input] = audioread("Temporary/MO202501-WQB4BVWP-20211017-193500-MULTICHANNEL_SNRpri_-2dB.flac");
 % STFT parameters
 N_STFT = 512;
 R_STFT = N_STFT/2;
@@ -17,8 +17,9 @@ figure;
 iterations = numel(input_stft(1,1,:));
 for i = 1:iterations
     subplot (iterations, 1, i);
-    plotSpec(input_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('f/kHz');
+    plotSpec(input_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Frequency (kHz)');
 end
+xlabel("Time");
 output_stft = zeros(numel(input_stft(:,1,1)), numel(input_stft(1,:,1)), flag);
 
 % filter coefficients
@@ -48,8 +49,9 @@ iterations = flag;
 figure;
 for i = 1:iterations
     subplot (iterations, 1, i);
-    plotSpec(output_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('f/kHz');
+    plotSpec(output_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Frequency (kHz)');
 end
+xlabel("Time");
 
 audiowrite("Temporary\00_current_test_result.wav", output_t, fs_input);
 
