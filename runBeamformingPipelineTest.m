@@ -1,9 +1,9 @@
 %% test results in frequency domain
 clear;
-load("MatData/w_mwf_00N02_00Y01.mat");
+load("MatData/w_mwf_00N03_00Y02.mat");
 
 % input time domain
-[input_t, fs_input] = audioread("Temporary/MO223303-PCGWZGP9-20230117-071000-MULTICHANNEL.flac");
+[input_t, fs_input] = audioread("MonitorNoiseAudio/audio_examples_inafarm/MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
 % STFT parameters
 N_STFT = 512;
 R_STFT = N_STFT/2;
@@ -71,6 +71,3 @@ disp(["input SNR: ",input_SNR]);
 signal_psd_out = mean(abs(x_hat_psd)) - mean(abs(noise_out_psd));
 output_SNR = 10*log10(sum(signal_psd_out)/sum(mean(abs(noise_out_psd))));
 disp(["output SNR: ",output_SNR]);
-
-%% test results in frequency domain
-
