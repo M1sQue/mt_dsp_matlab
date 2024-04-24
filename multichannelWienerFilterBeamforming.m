@@ -29,15 +29,22 @@ azimuth_deg = 0;
 azimuth = deg2rad(azimuth_deg);
 
 % mwf algorithm
-[N, fs_noiseOnly] = audioread("Temporary/00N01_SNR_-15.wav");
-[X, fs_target]= audioread("Temporary/00X01_SNR_15.wav");
-% [Y, fs_targetPlusNoise]= audioread("Temporary/SNR_0_switched_channel.wav");
+[N, fs_noiseOnly] = audioread("Temporary/00N03_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
+% [X, fs_target]= audioread("Temporary/00X01_SNR_15.wav");
+[Y, fs_targetPlusNoise]= audioread("Temporary/00Y02_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
 n_mics = numel(m_pos(1,:));
-P_NN = calculateCPSD(N, N, n_mics, fs_noiseOnly, f_sound);
-P_XX = calculateCPSD(X, X, n_mics, fs_target, f_sound);
-% P_YY = calculateCPSD(Y, Y, n_mics, fs_targetPlusNoise, f_sound);
-w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
-% w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
+
+% convert data to GPU arrays
+N_gpu = gpuArray(N);
+% X_gpu = gpuArray(X);
+Y_gpu = gpuArray(Y);
+
+P_NN = calculateCPSD(N_gpu, N_gpu, n_mics, fs_noiseOnly, f_sound);
+% P_XX = calculateCPSD(X_gpu, X_gpu, n_mics, fs_target, f_sound);
+P_YY = calculateCPSD(Y_gpu, Y_gpu, n_mics, fs_targetPlusNoise, f_sound);
+% w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
+w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
+w_mwf = gather(w_mwf);
 for i = 1:numel(w_mwf(:,1))
     w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
 end
@@ -74,19 +81,23 @@ f_sound_group = 100:100:8000; % sound frequency for beamforming
 W_MWF = cell(1, length(f_sound_group));
 
 % mwf algorithm
-[N, fs_noiseOnly] = audioread("Temporary/00N01_SNR_-15.wav");
-[X, fs_target]= audioread("Temporary/00X01_SNR_15.wav");
+[N, fs_noiseOnly] = audioread("Temporary/00N04_MO202501-N798NLFT-20220716-235500-MULTICHANNEL.flac");
+[X, fs_target]= audioread("Temporary/00X02_MO202501-N798NLFT-20220716-235500-MULTICHANNEL.flac");
 n_mics = numel(N(1, :));
+
+% convert data to GPU arrays
+N_gpu = gpuArray(N);
+X_gpu = gpuArray(X);
 
 for k = 1:length(f_sound_group)
     f_sound = f_sound_group(k);
-    P_NN = calculateCPSD(N, N, n_mics, fs_noiseOnly, f_sound);
-    P_XX = calculateCPSD(X, X, n_mics, fs_target, f_sound);
+    P_NN = calculateCPSD(N_gpu, N_gpu, n_mics, fs_noiseOnly, f_sound);
+    P_XX = calculateCPSD(X_gpu, X_gpu, n_mics, fs_target, f_sound);
     w_mwf = P_XX/(P_XX+P_NN); % enhance the target signal while minimizing the effect of noise
     for i = 1:numel(w_mwf(:,1))
         w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
     end 
-    W_MWF{k} = w_mwf;
+    W_MWF{k} = gather(w_mwf);
 end
 
 flag = 6;
@@ -100,21 +111,25 @@ f_sound_group = 100:100:8000; % sound frequency for beamforming
 W_MWF = cell(1, length(f_sound_group));
 
 % mwf algorithm
-[N, fs_noiseOnly] = audioread("Temporary/00N03_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
-[Y, fs_targetPlusNoise]= audioread("Temporary/00Y02_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
+[N, fs_noiseOnly] = audioread("Temporary/00N04_MO202501-N798NLFT-20220716-235500-MULTICHANNEL.flac");
+[Y, fs_targetPlusNoise]= audioread("Temporary/00Y03_MO202501-N798NLFT-20220716-235500-MULTICHANNEL.flac");
 n_mics = numel(N(1, :));
+
+% convert data to GPU arrays
+N_gpu = gpuArray(N);
+Y_gpu = gpuArray(Y);
 
 for k = 1:length(f_sound_group)
     f_sound = f_sound_group(k);
-    P_NN = calculateCPSD(N, N, n_mics, fs_noiseOnly, f_sound);
-    P_YY = calculateCPSD(Y, Y, n_mics, fs_targetPlusNoise, f_sound);
+    P_NN = calculateCPSD(N_gpu, N_gpu, n_mics, fs_noiseOnly, f_sound);
+    P_YY = calculateCPSD(Y_gpu, Y_gpu, n_mics, fs_targetPlusNoise, f_sound);
     w_mwf = (P_YY-P_NN)/P_YY; % attempt to remove the noise component from the total signal-plus-noise matrix, focusing on enhancing the clarity of the signal
     for i = 1:numel(w_mwf(:,1))
         w_mwf(i, :) = w_mwf(i, :)/sum(abs(w_mwf(i, :)));
     end 
-    W_MWF{k} = w_mwf;
+    W_MWF{k} = gather(w_mwf);
 end
 
 flag = 6;
-save("MatData/w_mwf_00N03_00Y02.mat", "W_MWF", "f_sound_group", "flag");
+save("MatData/w_mwf_00N04_00Y03.mat", "W_MWF", "f_sound_group", "flag");
 disp("Job done");

@@ -39,11 +39,14 @@ w_dasb = d_dasb;
 % mvdr algorithm
 d_mvdr = d_dasb.';
 n_mics = numel(m_pos(1,:));
-[noise, fs] = audioread("Temporary/SNR_-15_pure_noise.wav", [1 100000]);
-Phi_NN = calculateCPSD(noise, noise, n_mics, fs, f_sound);
+[noise, fs] = audioread("Temporary/00N01_SNR_-15.wav");
+noise_gpu = gpuArray(noise);
+
+Phi_NN = calculateCPSD(noise_gpu, noise_gpu, n_mics, fs, f_sound);
 Phi_NN_inv = inv(Phi_NN);
 w_mvdr = (Phi_NN_inv*d_mvdr/(d_mvdr'*Phi_NN_inv*d_mvdr)).';
 w_mvdr = w_mvdr/sum(abs(w_mvdr));
+w_mvdr = gather(w_mvdr);
 
 % simulation parameters
 sound_delay_angles = deg2rad(0:5:360);
@@ -119,11 +122,14 @@ for elevation_deg = elevation_range
     % MVDR beamforming
     d_mvdr = d_dasb.';
     n_mics = numel(m_pos(1,:));
-    [noise, fs] = audioread("Temporary/SNR_-15_pure_noise.wav", [1 100000]);
-    Phi_NN = calculateCPSD(noise, noise, n_mics, fs, f_sound);
+    [noise, fs] = audioread("Temporary/00N01_SNR_-15.wav");
+    noise_gpu = gpuArray(noise);
+
+    Phi_NN = calculateCPSD(noise_gpu, noise_gpu, n_mics, fs, f_sound);
     Phi_NN_inv = inv(Phi_NN);
     w_mvdr = (Phi_NN_inv*d_mvdr/(d_mvdr'*Phi_NN_inv*d_mvdr)).';
     w_mvdr = w_mvdr/sum(abs(w_mvdr));
+    w_mvdr = gather(w_mvdr);
 
     % Simulate sound from all directions
     sound_delay_angles = deg2rad(0:5:360);
@@ -195,12 +201,14 @@ for k = 1:length(f_sound_group)
 
     d_mvdr = d_dasb.';
     n_mics = numel(m_pos(1,:));
-    [noise, fs] = audioread("Temporary/SNR_-15_pure_noise.wav", [1 100000]);
-    Phi_NN = calculateCPSD(noise, noise, n_mics, fs, f_sound);
+    [noise, fs] = audioread("Temporary/SNR_-15_pure_noise.wav");
+    noise_gpu = gpuArray(noise);
+
+    Phi_NN = calculateCPSD(noise_gpu, noise_gpu, n_mics, fs, f_sound);
     Phi_NN_inv = inv(Phi_NN);
     w_mvdr = (Phi_NN_inv*d_mvdr/(d_mvdr'*Phi_NN_inv*d_mvdr)).';
     w_mvdr = w_mvdr/sum(abs(w_mvdr));
-    W_MVDR{k} = w_mvdr;
+    W_MVDR{k} = gather(w_mvdr);
 end
 
 flag = 1;

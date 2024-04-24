@@ -1,9 +1,9 @@
 %% test results in frequency domain
 clear;
-load("MatData/w_mwf_00N03_00Y02.mat");
+load("MatData/w_mwf_00N04_00Y03.mat");
 
 % input time domain
-[input_t, fs_input] = audioread("MonitorNoiseAudio/audio_examples_inafarm/MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
+[input_t, fs_input] = audioread("Temporary/toBeTested/MO202701-45VWTGQ9-20211025-221833-MULTICHANNEL.flac");
 % STFT parameters
 N_STFT = 512;
 R_STFT = N_STFT/2;
@@ -54,7 +54,7 @@ for i = 1:iterations
 end
 xlabel("Time");
 
-audiowrite("Temporary\00_current_test_result.wav", output_t, fs_input);
+audiowrite("Temporary/00_current_test_result.wav", output_t, fs_input);
 
 %% calculate SNR
 N_in = audioread("Temporary/zz_current_noise_in.flac");
