@@ -14,7 +14,7 @@ N_stft = calc_STFT(N, fs_noiseOnly, win, N_STFT, R_STFT, 'onesided');
 Y_stft = calc_STFT(Y, fs_targetPlusNoise, win, N_STFT, R_STFT, 'onesided');
 
 % input data time domain
-[input_t, fs_input] = audioread("Temporary/toBeTested/MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
+[input_t, fs_input] = audioread("Temporary/toBeTested/MO222002-7C99NW4P-20220902-082501-MULTICHANNEL.flac");
 % input data frequency domain
 input_stft = calc_STFT(input_t, fs_input, win, N_STFT, R_STFT, 'onesided');
 xTickProp = [0, R_STFT/fs_input, 0]; % R_STFT/fs_input, fs_input/R_STFT
