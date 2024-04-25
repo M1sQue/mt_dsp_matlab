@@ -1,9 +1,9 @@
 %% test results in frequency domain
 clear;
-load("MatData/w_mwf_00N04_00Y03.mat");
+load("MatData/w_mwf_00N03_00Y02.mat");
 
 % input time domain
-[input_t, fs_input] = audioread("Temporary/toBeTested/MO202701-45VWTGQ9-20211025-221833-MULTICHANNEL.flac");
+[input_t, fs_input] = audioread("Temporary/toBeTested/MO202501-WQB4BVWP-20211017-193500-MULTICHANNEL_SNRpri_0dB.flac");
 % STFT parameters
 N_STFT = 512;
 R_STFT = N_STFT/2;

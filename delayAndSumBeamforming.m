@@ -26,7 +26,7 @@ sys = db2mag(sys);
 
 % sound source parameters definition
 azimuth_deg = 0;
-elevation_deg = -45;
+elevation_deg = -90;
 azimuth = deg2rad(azimuth_deg);
 elevation = deg2rad(elevation_deg);
 s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
@@ -40,7 +40,7 @@ w_dasb = d_dasb;
 sound_delay_angles = deg2rad(0:5:360);
 sound_delay_positions = [cos(sound_delay_angles')*cos(azimuth) cos(sound_delay_angles')*sin(azimuth) sin(sound_delay_angles')];
 sound_delays = -sound_delay_positions*m_pos/c; % to simulate the propagation: with "-"
-simulations = w_dasb*(exp(-1j*2*pi*f_sound*sound_delays).*sys).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
+simulations = w_dasb*(exp(-1j*2*pi*f_sound*sound_delays)).'; % to simulate signals from all directions: with "-"; do NOT use Hermitian
 
 % simulation polar plot
 H_threshold = max(mag2db(abs(simulations)));

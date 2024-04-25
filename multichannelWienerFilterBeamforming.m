@@ -111,8 +111,8 @@ f_sound_group = 100:100:8000; % sound frequency for beamforming
 W_MWF = cell(1, length(f_sound_group));
 
 % mwf algorithm
-[N, fs_noiseOnly] = audioread("Temporary/00N04_MO202501-N798NLFT-20220716-235500-MULTICHANNEL.flac");
-[Y, fs_targetPlusNoise]= audioread("Temporary/00Y03_MO202501-N798NLFT-20220716-235500-MULTICHANNEL.flac");
+[N, fs_noiseOnly] = audioread("Temporary/00N05_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
+[Y, fs_targetPlusNoise]= audioread("Temporary/00Y04_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
 n_mics = numel(N(1, :));
 
 % convert data to GPU arrays
