@@ -5,13 +5,22 @@ N_STFT = 2048;
 R_STFT = N_STFT/2;
 win = sqrt(hann(N_STFT,'periodic'));
 
+r = 0.057; % coordinate unit length
+c = 343.3; % speed of sound
+% microphone system parameters definition
+m_pos = [r 0 0; r/2 -sqrt(3)/2*r 0; -r/2 -sqrt(3)/2*r 0; -r 0 0; -r/2 sqrt(3)/2*r 0; r/2 sqrt(3)/2*r 0]';
+% sound source parameters definition
+azimuth_deg = 0;
+elevation_deg = -90;
+azimuth = deg2rad(azimuth_deg);
+elevation = deg2rad(elevation_deg);
+s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
+
 % load data
-% mwf coefficients calculation data time domain
+% mvdr coefficients calculation data time domain
 [N, fs_noiseOnly] = audioread("Temporary/00N05_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
-[Y, fs_targetPlusNoise]= audioread("Temporary/00Y04_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
-% mwf coefficients calculation data frequency domain
+% mvdr coefficients calculation data frequency domain
 N_stft = calc_STFT(N, fs_noiseOnly, win, N_STFT, R_STFT, 'onesided');
-Y_stft = calc_STFT(Y, fs_targetPlusNoise, win, N_STFT, R_STFT, 'onesided');
 
 % input data time domain
 [input_t, fs_input] = audioread("Temporary/toBeTested/MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
@@ -30,28 +39,28 @@ end
 xlabel("Time");
 
 % initialize the output
-output_stft = zeros(size(input_stft));
+output_stft = zeros(numel(input_stft(:,1,1)),numel(input_stft(1,:,1)),1);
 
 % pipeline
 % calculate psd
 [P_NN_smth, P_NN_mean] = estim_corrmat(N_stft, 1);
-[P_YY_smth, P_YY_mean] = estim_corrmat(Y_stft, 1);
 P_NN = squeeze(P_NN_mean);
-P_YY = squeeze(P_YY_mean);
 n_frames = numel(input_stft(:,1,1));
 
 % calculate coefficients then apply
 for i = 1:n_frames
-    w_mwf = (squeeze(P_YY(i,:,:))-squeeze(P_NN(i,:,:)))/squeeze(P_YY(i,:,:));
-    output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_mwf;
+    % delay and sum algorithm
+    dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
+    d_dasb = exp(-1j*2*pi*(fs_input/N_STFT*n_frames)*dasb_delay)/numel(m_pos(1,:));
+    d_mvdr = d_dasb.';
+    Phi_NN = squeeze(P_NN(i,:,:));
+    w_mvdr = ((Phi_NN\d_mvdr)/((d_mvdr'/Phi_NN)*d_mvdr));
+    output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_mvdr;
 end
 
 % plot output
 figure;
-for i = 1:iterations
-    subplot (iterations, 1, i);
-    plotSpec(output_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Frequency (kHz)');
-end
+plotSpec(output_stft(:,:,1),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Frequency (kHz)');
 xlabel("Time");
 
 % output in time domain
