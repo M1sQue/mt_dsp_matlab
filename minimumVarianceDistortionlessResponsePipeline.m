@@ -51,11 +51,12 @@ n_frames = numel(input_stft(:,1,1));
 for i = 1:n_frames
     % delay and sum algorithm
     dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
-    d_dasb = exp(-1j*2*pi*(fs_input/N_STFT*n_frames)*dasb_delay)/numel(m_pos(1,:));
+    d_dasb = exp(-1j*2*pi*((fs_input/2)/(N_STFT/2+1)*(i-1))*dasb_delay)/numel(m_pos(1,:));
     d_mvdr = d_dasb.';
     Phi_NN = squeeze(P_NN(i,:,:));
-    w_mvdr = ((Phi_NN\d_mvdr)/((d_mvdr'/Phi_NN)*d_mvdr));
-    output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_mvdr;
+    w_mvdr = ((Phi_NN\d_mvdr)/((d_mvdr.'/Phi_NN)*d_mvdr));
+%     w_mvdr = w_mvdr/sum(abs(w_mvdr));
+    output_stft(i,:,:) = squeeze(input_stft(i,:,:))*w_mvdr;
 end
 
 % plot output
@@ -70,7 +71,6 @@ output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
 audiowrite("Temporary/00_current_test_result.wav", output_t, fs_input);
 
 %% calculate SNR
-clc;
 N_in = audioread("Temporary/zz_current_noise_in.flac");
 N_out = audioread("Temporary/zz_current_noise_out.wav");
 noise_in_psd = pwelch(N_in);

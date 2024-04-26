@@ -43,7 +43,10 @@ n_frames = numel(input_stft(:,1,1));
 % calculate coefficients then apply
 for i = 1:n_frames
     w_mwf = (squeeze(P_YY(i,:,:))-squeeze(P_NN(i,:,:)))/squeeze(P_YY(i,:,:));
-    output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_mwf;
+%     for j = 1:numel(w_mwf(:,1))
+%         w_mwf(j, :) = w_mwf(j, :)/sum(abs(w_mwf(j, :)));
+%     end
+    output_stft(i,:,:) = squeeze(input_stft(i,:,:))*w_mwf;
 end
 
 % plot output
@@ -61,7 +64,6 @@ output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
 audiowrite("Temporary/00_current_test_result.wav", output_t, fs_input);
 
 %% calculate SNR
-clc;
 N_in = audioread("Temporary/zz_current_noise_in.flac");
 N_out = audioread("Temporary/zz_current_noise_out.wav");
 noise_in_psd = pwelch(N_in);
