@@ -52,6 +52,7 @@ for i = 1:n_frames
     % delay and sum algorithm
     dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
     d_dasb = exp(-1j*2*pi*((fs_input/2)/(N_STFT/2+1)*(i-1))*dasb_delay)/numel(m_pos(1,:));
+    % mvdr algorithm
     d_mvdr = d_dasb.';
     Phi_NN = squeeze(P_NN(i,:,:));
     w_mvdr = ((Phi_NN\d_mvdr)/((d_mvdr.'/Phi_NN)*d_mvdr));
