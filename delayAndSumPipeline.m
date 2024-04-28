@@ -64,7 +64,7 @@ A_compen(1:ceil(200*N_STFT/fs),:) =  ones(ceil(200*N_STFT/fs),numel(A_compen(1,:
 A_compen(ceil(10000*N_STFT/fs):end,:) =  ones(size(A_compen(ceil(10000*N_STFT/fs):end,:)));
 A_compen = db2mag(A_compen);
 % input data time domain
-[input_t, fs_input] = audioread("Temporary/Input_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
+[input_t, fs_input] = audioread("Temporary/toBeTested/MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
 % input data frequency domain
 input_stft = calc_STFT(input_t, fs_input, win, N_STFT, R_STFT, 'onesided');
 xTickProp = [0, R_STFT/fs_input, 0]; % R_STFT/fs_input, fs_input/R_STFT
@@ -91,9 +91,10 @@ for i = 1:n_frames
     % delay and sum algorithm
     dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
     d_dasb = exp(-1j*2*pi*(fs_input/N_STFT*n_frames)*dasb_delay)/numel(m_pos(1,:));
-    w_dasb =(d_dasb.*A_compen(i,:)).';
+%     w_dasb =(d_dasb.*A_compen(i,:)).';
+    w_dasb =(d_dasb).';
     %normalization
-    w_dasb = w_dasb/sum(abs(w_dasb));
+%     w_dasb = w_dasb/sum(abs(w_dasb));
     % w_dasb =d_dasb.';
     output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_dasb;
 end
@@ -110,7 +111,6 @@ output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
 audiowrite("Temporary/00_current_test_result.wav", output_t, fs_input);
 
 %% calculate SNR
-clc;
 N_in = audioread("Temporary/zz_current_noise_in.flac");
 N_out = audioread("Temporary/zz_current_noise_out.wav");
 noise_in_psd = pwelch(N_in);
