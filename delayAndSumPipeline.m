@@ -59,7 +59,7 @@ load("MatData/polars.mat");
 %compensation coefficient for target direction range:
 %elevation_deg-compen_width_deg/2:elevation_deg+compen_width_deg/2
 compen_width_deg = 40;
-compen_index = mod([elevation_deg-compen_width_deg/2:step:elevation_deg+compen_width_deg/2]+360,360)/step +1;
+compen_index = mod((elevation_deg-compen_width_deg/2:step:elevation_deg+compen_width_deg/2)+360,360)/step +1;
 A_compen = -mean(polars(:,compen_index,:),2);
 %discard compensation for f<200Hz(sinesweep not covered) 
 A_compen(1:ceil(200*N_STFT/fs),:) =  ones(ceil(200*N_STFT/fs),numel(A_compen(1,:)));
