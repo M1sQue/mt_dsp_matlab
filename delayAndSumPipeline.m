@@ -55,14 +55,18 @@ save("MatData/polars.mat", "polars");
 disp("Job done");
 %%
 load("MatData/polars.mat");
-compen_index = mod(elevation_deg+360,360)/step +1;
-%compensation coefficient for target direction: elevation_deg
-A_compen = -polars(:,compen_index,:);
+
+%compensation coefficient for target direction range:
+%elevation_deg-compen_width_deg/2:elevation_deg+compen_width_deg/2
+compen_width_deg = 40;
+compen_index = mod([elevation_deg-compen_width_deg/2:step:elevation_deg+compen_width_deg/2]+360,360)/step +1;
+A_compen = -mean(polars(:,compen_index,:),2);
 %discard compensation for f<200Hz(sinesweep not covered) 
 A_compen(1:ceil(200*N_STFT/fs),:) =  ones(ceil(200*N_STFT/fs),numel(A_compen(1,:)));
 %discard compensation for f>8000Hz(not accurate) 
 A_compen(ceil(10000*N_STFT/fs):end,:) =  ones(size(A_compen(ceil(10000*N_STFT/fs):end,:)));
 A_compen = db2mag(A_compen);
+
 % input data time domain
 [input_t, fs_input] = audioread("Temporary/toBeTested/MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
 % input data frequency domain
@@ -91,10 +95,9 @@ for i = 1:n_frames
     % delay and sum algorithm
     dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
     d_dasb = exp(-1j*2*pi*(fs_input/N_STFT*n_frames)*dasb_delay)/numel(m_pos(1,:));
-%     w_dasb =(d_dasb.*A_compen(i,:)).';
-    w_dasb =(d_dasb).';
+    w_dasb =(d_dasb.*A_compen(i,:)).';
     %normalization
-%     w_dasb = w_dasb/sum(abs(w_dasb));
+    w_dasb = w_dasb/sum(abs(w_dasb));
     % w_dasb =d_dasb.';
     output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_dasb;
 end
