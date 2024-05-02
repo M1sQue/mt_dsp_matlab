@@ -1,6 +1,7 @@
 %% compare plots
 % STFT related parameters
 clear;
+addpath("FromThomasDietzen\")
 N_STFT = 2048;
 R_STFT = N_STFT/2;
 win = sqrt(hann(N_STFT,'periodic'));
@@ -38,10 +39,10 @@ output_stft = zeros(size(input_stft));
 [P_YY_smth, P_YY_mean] = estim_corrmat(Y_stft, 1);
 P_NN = squeeze(P_NN_mean);
 P_YY = squeeze(P_YY_mean);
-n_frames = numel(input_stft(:,1,1));
+n_freq_bins = numel(input_stft(:,1,1));
 
 % calculate coefficients then apply
-for i = 1:n_frames
+for i = 1:n_freq_bins
     w_mwf = (squeeze(P_YY(i,:,:))-squeeze(P_NN(i,:,:)))/squeeze(P_YY(i,:,:));
 %     for j = 1:numel(w_mwf(:,1))
 %         w_mwf(j, :) = w_mwf(j, :)/sum(abs(w_mwf(j, :)));

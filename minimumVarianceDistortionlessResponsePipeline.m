@@ -1,6 +1,7 @@
 %% compare plots
 % STFT related parameters
 clear;
+addpath("FromThomasDietzen\")
 N_STFT = 2048;
 R_STFT = N_STFT/2;
 win = sqrt(hann(N_STFT,'periodic'));
@@ -45,10 +46,10 @@ output_stft = zeros(numel(input_stft(:,1,1)),numel(input_stft(1,:,1)),1);
 % calculate psd
 [P_NN_smth, P_NN_mean] = estim_corrmat(N_stft, 1);
 P_NN = squeeze(P_NN_mean);
-n_frames = numel(input_stft(:,1,1));
+n_freq_bins = numel(input_stft(:,1,1));
 
 % calculate coefficients then apply
-for i = 1:n_frames
+for i = 1:n_freq_bins
     % delay and sum algorithm
     dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
     d_dasb = exp(-1j*2*pi*((fs_input/2)/(N_STFT/2+1)*(i-1))*dasb_delay)/numel(m_pos(1,:));
