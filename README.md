@@ -3,7 +3,7 @@
 ## Thesis Title 📖
 **Enhancing Acoustic Monitoring in Noisy Pig Barns: Fixed Beamformer Designs for Six-Channel Circular Microphone Arrays**
 
-## Authors 👩‍🎓👨‍🎓
+## Authors 👨‍🎓👨‍🎓
 - Aocheng Zhao
 - Ruicong Wang
 
