@@ -1,5 +1,6 @@
 %% figure
 clear;
+addpath("OldScripts\");
 polars_cell = cell(1,6);
 for i = 1:6
     load(sprintf("MatData/polars_average_channel_%d.mat", i));
@@ -72,6 +73,7 @@ title(sprintf("azimuth %d°, elevation %d°, frequency %dHz", azimuth_deg, eleva
 
 %% animation
 clear;
+addpath("OldScripts\");
 % Load microphone array data
 polars_cell = cell(1,6);
 for i = 1:6
@@ -175,6 +177,7 @@ end
 
 %% only calculate coefficients
 clear;
+addpath("OldScripts\");
 
 f_sound_group = 100:200:8000; % sound frequency for beamforming
 r = 0.057; % coordinate unit length

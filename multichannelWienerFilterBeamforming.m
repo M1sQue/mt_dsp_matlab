@@ -1,5 +1,6 @@
 %% show figures
 clear;
+addpath("OldScripts\");
 polars_cell = cell(1,6);
 for i = 1:6
     load(sprintf("MatData/polars_average_channel_%d.mat", i));
@@ -76,6 +77,7 @@ end
 
 %% only calculate coefficients XN
 clear;
+addpath("OldScripts\");
 
 f_sound_group = 100:100:8000; % sound frequency for beamforming
 W_MWF = cell(1, length(f_sound_group));
@@ -106,6 +108,7 @@ disp("Job done");
 
 %% only calculate coefficients YN
 clear;
+addpath("OldScripts\");
 
 f_sound_group = 100:100:8000; % sound frequency for beamforming
 W_MWF = cell(1, length(f_sound_group));
