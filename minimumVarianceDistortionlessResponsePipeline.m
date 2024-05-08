@@ -48,12 +48,13 @@ output_stft = zeros(numel(input_stft(:,1,1)),numel(input_stft(1,:,1)),1);
 P_NN = squeeze(P_NN_mean);
 n_freq_bins = numel(input_stft(:,1,1));
 
+% delay and sum algorithm
+dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
+
 % calculate coefficients then apply
 for i = 1:n_freq_bins
     % delay and sum algorithm
-    dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
     d_dasb = exp(-1j*2*pi*((fs_input/2)/(N_STFT/2+1)*(i-1))*dasb_delay)/numel(m_pos(1,:));
-    w_dasb = d_dasb.';
     % mvdr algorithm
     d_mvdr = d_dasb.';
     Phi_NN = squeeze(P_NN(i,:,:));
