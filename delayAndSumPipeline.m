@@ -130,3 +130,5 @@ disp(["input SNR: ",input_SNR]);
 signal_psd_out = mean(abs(x_hat_psd)) - mean(abs(noise_out_psd));
 output_SNR = 10*log10(sum(signal_psd_out)/sum(mean(abs(noise_out_psd))));
 disp(["output SNR: ",output_SNR]);
+snr_improvement = output_SNR - input_SNR;
+disp(["SNR improvement: ",snr_improvement]);
