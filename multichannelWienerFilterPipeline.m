@@ -69,7 +69,7 @@ for fileNr = 1:totalFileNr
     output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
     
     % write output signal
-    audiowrite(sprintf("Temporary/toBeTested/set%d_out_MWF/Recording (%d).flac", fileNr), output_t, fs_input);
+    audiowrite(sprintf("Temporary/toBeTested/set%d_out_MWF/Recording (%d).flac", setNr, fileNr), output_t, fs_input);
 
     % save plots
     saveas(fig_in, sprintf("Temporary/Figures/set%d/MWF_in_rec%d.svg", setNr, fileNr));
