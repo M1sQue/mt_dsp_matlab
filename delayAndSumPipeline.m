@@ -104,8 +104,8 @@ for fileNr = 1:totalFileNr
         % delay and sum algorithm
         dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
         d_dasb = exp(-1j*2*pi*(fs_input/N_STFT*n_freq_bins)*dasb_delay)/numel(m_pos(1,:));
-%         w_dasb =(d_dasb.*A_compen(i,:)).';
-        w_dasb = d_dasb.';
+        w_dasb =(d_dasb.*A_compen(i,:)).';
+%         w_dasb = d_dasb.';
         %normalization
         w_dasb = w_dasb/sum(abs(w_dasb));
         output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_dasb;
@@ -120,11 +120,11 @@ for fileNr = 1:totalFileNr
     output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
     
     % write output signal
-    audiowrite(sprintf("Temporary/toBeTested/set%d_out_DS/Recording (%d).flac", setNr, fileNr), output_t, fs_input);
+    audiowrite(sprintf("Temporary/toBeTested/set%d_out_DSC/Recording (%d).flac", setNr, fileNr), output_t, fs_input);
     
     % save plots
-    saveas(fig_in, sprintf("Temporary/Figures/set%d/DS_in_rec%d.png", setNr, fileNr));
-    saveas(fig_out,sprintf("Temporary/Figures/set%d/DS_out_rec%d.png", setNr, fileNr));
+    saveas(fig_in, sprintf("Temporary/Figures/set%d/DSC_in_rec%d.png", setNr, fileNr));
+    saveas(fig_out,sprintf("Temporary/Figures/set%d/DSC_out_rec%d.png", setNr, fileNr));
     disp("Job done!");
 end
 
@@ -135,8 +135,8 @@ fileNr = 1;
 input_t = audioread(sprintf("Temporary/toBeTested/set%d/Recording (%d).flac", fileNr));
 N_in = audioread(sprintf("Temporary/toBeTested/set%d/Noise (%d).flac", fileNr));
 
-output_t = audioread(sprintf("Temporary/toBeTested/set%d_out_DS/Recording (%d).flac", setNr, fileNr));
-N_out = audioread(sprintf("Temporary/toBeTested/set%d_out_DS/Noise (%d).flac", setNr, fileNr));
+output_t = audioread(sprintf("Temporary/toBeTested/set%d_out_DSC/Recording (%d).flac", setNr, fileNr));
+N_out = audioread(sprintf("Temporary/toBeTested/set%d_out_DSC/Noise (%d).flac", setNr, fileNr));
 noise_in_psd = pwelch(N_in);
 noise_out_psd = pwelch(N_out);
 y_psd = pwelch(input_t);
