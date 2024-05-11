@@ -82,8 +82,8 @@ for fileNr = 1:totalFileNr
     audiowrite(sprintf("Temporary/toBeTested/set%d_out_MVDR/Recording (%d).flac", setNr, fileNr), output_t, fs_input);
 
     % save plots
-    saveas(fig_in, sprintf("Temporary/Figures/set%d/MVDR_in_rec%d.svg", setNr, fileNr));
-    saveas(fig_out,sprintf("Temporary/Figures/set%d/MVDR_out_rec%d.svg", setNr, fileNr));
+    saveas(fig_in, sprintf("Temporary/Figures/set%d/MVDR_in_rec%d.png", setNr, fileNr));
+    saveas(fig_out,sprintf("Temporary/Figures/set%d/MVDR_out_rec%d.png", setNr, fileNr));
     disp("Job done!");
 end
 
