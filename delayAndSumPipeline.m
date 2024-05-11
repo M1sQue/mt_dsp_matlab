@@ -76,7 +76,7 @@ if setNr == 1
 else
     totalFileNr = 8;
 end
-for fileNr = 1:8
+for fileNr = 1:totalFileNr
     [input_t, fs_input] = audioread(sprintf("Temporary/toBeTested/set%d/Recording (%d).flac", setNr, fileNr));
     % input data frequency domain
     input_stft = calc_STFT(input_t, fs_input, win, N_STFT, R_STFT, 'onesided');

@@ -12,7 +12,7 @@ if setNr == 1
 else
     totalFileNr = 8;
 end
-for fileNr = 1:8
+for fileNr = 1:totalFileNr
     % load data
     % mwf coefficients calculation data time domain
     [N, fs_noiseOnly] = audioread(sprintf("Temporary/toBeTested/set1/Noise (%d).flac", setNr, fileNr));
@@ -51,9 +51,9 @@ for fileNr = 1:8
     % calculate coefficients then apply
     for i = 1:n_freq_bins
         w_mwf = (squeeze(P_YY(i,:,:))-squeeze(P_NN(i,:,:)))/squeeze(P_YY(i,:,:));
-    %     for j = 1:numel(w_mwf(:,1))
-    %         w_mwf(j, :) = w_mwf(j, :)/sum(abs(w_mwf(j, :)));
-    %     end
+        for j = 1:numel(w_mwf(:,1))
+            w_mwf(j, :) = w_mwf(j, :)/sum(abs(w_mwf(j, :)));
+        end
         output_stft(i,:,:) = squeeze(input_stft(i,:,:))*w_mwf;
     end
     

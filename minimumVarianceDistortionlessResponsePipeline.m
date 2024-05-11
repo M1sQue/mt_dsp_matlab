@@ -23,7 +23,7 @@ if setNr == 1
 else
     totalFileNr = 8;
 end
-for fileNr = 1:10
+for fileNr = 1:totalFileNr
     % load data
     % mvdr coefficients calculation data time domain
     [N, fs_noiseOnly] = audioread(sprintf("Temporary/toBeTested/set%d/Noise (%d).flac", setNr, fileNr));
@@ -66,7 +66,7 @@ for fileNr = 1:10
         d_mvdr = d_dasb.';
         Phi_NN = squeeze(P_NN(i,:,:));
         w_mvdr = ((Phi_NN\d_mvdr)/((d_mvdr.'/Phi_NN)*d_mvdr));
-    %     w_mvdr = w_mvdr/sum(abs(w_mvdr));
+        w_mvdr = w_mvdr/sum(abs(w_mvdr));
         output_stft(i,:,:) = squeeze(input_stft(i,:,:))*w_mvdr;
     end
     
