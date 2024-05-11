@@ -17,66 +17,85 @@ azimuth = deg2rad(azimuth_deg);
 elevation = deg2rad(elevation_deg);
 s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevation)];
 
-% load data
-% mvdr coefficients calculation data time domain
-[N, fs_noiseOnly] = audioread("Temporary/00N05_MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
-% mvdr coefficients calculation data frequency domain
-N_stft = calc_STFT(N, fs_noiseOnly, win, N_STFT, R_STFT, 'onesided');
-
-% input data time domain
-[input_t, fs_input] = audioread("Temporary/toBeTested/MO201701-9R88J6JG-20221013-235500-MULTICHANNEL.flac");
-% input data frequency domain
-input_stft = calc_STFT(input_t, fs_input, win, N_STFT, R_STFT, 'onesided');
-xTickProp = [0, R_STFT/fs_input, 0]; % R_STFT/fs_input, fs_input/R_STFT
-yTickProp = [0, fs_input/(2000*R_STFT), R_STFT/2];
-cRange    = [-45 15];
-% plot input
-figure;
-iterations = numel(input_stft(1,1,:));
-for i = 1:iterations
-    subplot (iterations, 1, i);
-    plotSpec(input_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Frequency (kHz)');
+setNr = 1;
+if setNr == 1
+    totalFileNr = 10;
+else
+    totalFileNr = 8;
 end
-xlabel("Time");
-
-% initialize the output
-output_stft = zeros(numel(input_stft(:,1,1)),numel(input_stft(1,:,1)),1);
-
-% pipeline
-% calculate psd
-[P_NN_smth, P_NN_mean] = estim_corrmat(N_stft, 1);
-P_NN = squeeze(P_NN_mean);
-n_freq_bins = numel(input_stft(:,1,1));
-
-% delay and sum algorithm
-dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
-
-% calculate coefficients then apply
-for i = 1:n_freq_bins
+for fileNr = 1:10
+    % load data
+    % mvdr coefficients calculation data time domain
+    [N, fs_noiseOnly] = audioread(sprintf("Temporary/toBeTested/set%d/Noise (%d).flac", setNr, fileNr));
+    % mvdr coefficients calculation data frequency domain
+    N_stft = calc_STFT(N, fs_noiseOnly, win, N_STFT, R_STFT, 'onesided');
+    
+    % input data time domain
+    [input_t, fs_input] = audioread(sprintf("Temporary/toBeTested/set%d/Recording (%d).flac", setNr, fileNr));
+    % input data frequency domain
+    input_stft = calc_STFT(input_t, fs_input, win, N_STFT, R_STFT, 'onesided');
+    xTickProp = [0, R_STFT/fs_input, 0]; % R_STFT/fs_input, fs_input/R_STFT
+    yTickProp = [0, fs_input/(2000*R_STFT), R_STFT/2];
+    cRange    = [-45 15];
+    % plot input
+    fig_in = figure;
+    iterations = numel(input_stft(1,1,:));
+    for i = 1:iterations
+        subplot (iterations, 1, i);
+        plotSpec(input_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Freq (kHz)');
+    end
+    xlabel("Time");
+    
+    % initialize the output
+    output_stft = zeros(numel(input_stft(:,1,1)),numel(input_stft(1,:,1)),1);
+    
+    % pipeline
+    % calculate psd
+    [P_NN_smth, P_NN_mean] = estim_corrmat(N_stft, 1);
+    P_NN = squeeze(P_NN_mean);
+    n_freq_bins = numel(input_stft(:,1,1));
+    
     % delay and sum algorithm
-    d_dasb = exp(-1j*2*pi*((fs_input/2)/(N_STFT/2+1)*(i-1))*dasb_delay)/numel(m_pos(1,:));
-    % mvdr algorithm
-    d_mvdr = d_dasb.';
-    Phi_NN = squeeze(P_NN(i,:,:));
-    w_mvdr = ((Phi_NN\d_mvdr)/((d_mvdr.'/Phi_NN)*d_mvdr));
-%     w_mvdr = w_mvdr/sum(abs(w_mvdr));
-    output_stft(i,:,:) = squeeze(input_stft(i,:,:))*w_mvdr;
+    dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
+    
+    % calculate coefficients then apply
+    for i = 1:n_freq_bins
+        % delay and sum algorithm
+        d_dasb = exp(-1j*2*pi*((fs_input/2)/(N_STFT/2+1)*(i-1))*dasb_delay)/numel(m_pos(1,:));
+        % mvdr algorithm
+        d_mvdr = d_dasb.';
+        Phi_NN = squeeze(P_NN(i,:,:));
+        w_mvdr = ((Phi_NN\d_mvdr)/((d_mvdr.'/Phi_NN)*d_mvdr));
+    %     w_mvdr = w_mvdr/sum(abs(w_mvdr));
+        output_stft(i,:,:) = squeeze(input_stft(i,:,:))*w_mvdr;
+    end
+    
+    % plot output
+    fig_out = figure;
+    plotSpec(output_stft(:,:,1),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Freq (kHz)');
+    xlabel("Time");
+    
+    % output in time domain
+    output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
+    
+    % write output signal
+    audiowrite(sprintf("Temporary/toBeTested/set%d_out_MVDR/Recording (%d).flac", setNr, fileNr), output_t, fs_input);
+
+    % save plots
+    saveas(fig_in, sprintf("Temporary/Figures/set%d/MVDR_in_rec%d.svg", setNr, fileNr));
+    saveas(fig_out,sprintf("Temporary/Figures/set%d/MVDR_out_rec%d.svg", setNr, fileNr));
+    disp("Job done!");
 end
-
-% plot output
-figure;
-plotSpec(output_stft(:,:,1),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Frequency (kHz)');
-xlabel("Time");
-
-% output in time domain
-output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
-
-% write output signal
-audiowrite("Temporary/00_current_test_result.wav", output_t, fs_input);
 
 %% calculate SNR
-N_in = audioread("Temporary/zz_current_noise_in.flac");
-N_out = audioread("Temporary/zz_current_noise_out.wav");
+clc;
+setNr = 1;
+fileNr = 1;
+input_t = audioread(sprintf("Temporary/toBeTested/set%d/Recording (%d).flac", setNr, fileNr));
+N_in = audioread(sprintf("Temporary/toBeTested/set%d/Noise (%d).flac", setNr, fileNr));
+
+output_t = audioread(sprintf("Temporary/toBeTested/set%d_out_MVDR/Recording (%d).flac", setNr, fileNr));
+N_out = audioread(sprintf("Temporary/toBeTested/set%d_out_MVDR/Noise (%d).flac", setNr, fileNr));
 noise_in_psd = pwelch(N_in);
 noise_out_psd = pwelch(N_out);
 y_psd = pwelch(input_t);
