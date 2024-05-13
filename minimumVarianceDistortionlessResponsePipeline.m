@@ -19,7 +19,7 @@ s_pos = 50*r*[cos(elevation)*cos(azimuth) cos(elevation)*sin(azimuth) sin(elevat
 
 for setNr = 1:2
     if setNr == 1
-        totalFileNr = 16;
+        totalFileNr = 18;
     else
         totalFileNr = 8;
     end
@@ -82,7 +82,7 @@ for setNr = 1:2
         audiowrite(sprintf("Temporary/toBeTested/out_MVDR/set%d_Recording (%d).flac", setNr, fileNr), output_t, fs_input);
     
         % save plots
-        saveas(fig_in, sprintf("Temporary/figures/in_MVDR/set%d_Recording (%d).png", setNr, fileNr));
+        saveas(fig_in, sprintf("Temporary/figures/set%d_Recording (%d).png", setNr, fileNr));
         saveas(fig_out,sprintf("Temporary/figures/out_MVDR/set%d_Recording (%d).png", setNr, fileNr));
         disp("Job done!");
     end

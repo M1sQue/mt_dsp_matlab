@@ -72,7 +72,7 @@ A_compen = db2mag(A_compen);
 % input data time domain
 for setNr = 1:2
     if setNr == 1
-        totalFileNr = 10;
+        totalFileNr = 18;
     else
         totalFileNr = 8;
     end
@@ -123,7 +123,7 @@ for setNr = 1:2
         audiowrite(sprintf("Temporary/toBeTested/out_DSC/set%d_Recording (%d).flac", setNr, fileNr), output_t, fs_input);
         
         % save plots
-        saveas(fig_in, sprintf("Temporary/figures/in_DSC/set%d_Recording (%d).png", setNr, fileNr));
+        saveas(fig_in, sprintf("Temporary/figures/set%d_Recording (%d).png", setNr, fileNr));
         saveas(fig_out,sprintf("Temporary/figures/out_DSC/set%d_Recording (%d).png", setNr, fileNr));
         disp("Job done!");
     end
