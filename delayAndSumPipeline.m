@@ -104,8 +104,8 @@ for setNr = 1:2
             % delay and sum algorithm
             dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
             d_dasb = exp(-1j*2*pi*(fs_input/N_STFT*n_freq_bins)*dasb_delay)/numel(m_pos(1,:));
-            w_dasb =(d_dasb.*A_compen(i,:)).'; % DSC
-    %         w_dasb = d_dasb.'; % DS
+            w_dasb =(d_dasb.*A_compen(i,:)).';
+    %         w_dasb = d_dasb.';
             %normalization
             w_dasb = w_dasb/sum(abs(w_dasb));
             output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_dasb;
