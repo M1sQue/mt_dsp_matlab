@@ -137,7 +137,7 @@ input_t = audioread(sprintf("Temporary/toBeTested/set%d_Recording (%d).flac", se
 N_in = audioread(sprintf("Temporary/toBeTested/set%d_N (%d).flac", setNr, fileNr));
 
 output_t = audioread(sprintf("Temporary/toBeTested/out_DSC/set%d_Recording (%d).flac", setNr, fileNr));
-N_out = audioread(sprintf("Temporary/toBeTested/out_DSC/set%d_Recording (%d).flac", setNr, fileNr));
+N_out = audioread(sprintf("Temporary/toBeTested/out_DSC/set%d_N (%d).flac", setNr, fileNr));
 noise_in_psd = pwelch(N_in);
 noise_out_psd = pwelch(N_out);
 y_psd = pwelch(input_t);
