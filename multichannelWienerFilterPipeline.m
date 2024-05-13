@@ -15,7 +15,7 @@ for setNr = 1:2
     for fileNr = 1:totalFileNr
         % load data
         % mwf coefficients calculation data time domain
-        [N, fs_noiseOnly] = audioread(sprintf("Temporary/toBeTested/set%d_Noise (%d).flac", setNr, fileNr));
+        [N, fs_noiseOnly] = audioread(sprintf("Temporary/toBeTested/set%d_N (%d).flac", setNr, fileNr));
         [Y, fs_targetPlusNoise]= audioread(sprintf("Temporary/toBeTested/set%d_Y (%d).flac", setNr, fileNr));
         % mwf coefficients calculation data frequency domain
         N_stft = calc_STFT(N, fs_noiseOnly, win, N_STFT, R_STFT, 'onesided');
@@ -83,7 +83,7 @@ clc;
 setNr = 1;
 fileNr = 1;
 input_t = audioread(sprintf("Temporary/toBeTested/set%d_Recording (%d).flac", setNr, fileNr));
-N_in = audioread(sprintf("Temporary/toBeTested/set%d_Noise (%d).flac", setNr, fileNr));
+N_in = audioread(sprintf("Temporary/toBeTested/set%d_N (%d).flac", setNr, fileNr));
 
 output_t = audioread(sprintf("Temporary/toBeTested/out_MWF/set%d_Recording (%d).flac", setNr, fileNr));
 N_out = audioread(sprintf("Temporary/toBeTested/out_MWF/set%d_Recording (%d).flac", setNr, fileNr));

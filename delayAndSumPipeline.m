@@ -134,7 +134,7 @@ clc;
 setNr = 1;
 fileNr = 1;
 input_t = audioread(sprintf("Temporary/toBeTested/set%d_Recording (%d).flac", setNr, fileNr));
-N_in = audioread(sprintf("Temporary/toBeTested/set%d_Noise (%d).flac", setNr, fileNr));
+N_in = audioread(sprintf("Temporary/toBeTested/set%d_N (%d).flac", setNr, fileNr));
 
 output_t = audioread(sprintf("Temporary/toBeTested/out_DSC/set%d_Recording (%d).flac", setNr, fileNr));
 N_out = audioread(sprintf("Temporary/toBeTested/out_DSC/set%d_Recording (%d).flac", setNr, fileNr));
