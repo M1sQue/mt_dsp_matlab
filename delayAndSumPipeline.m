@@ -70,73 +70,74 @@ A_compen(ceil(10000*N_STFT/fs):end,:) =  ones(size(A_compen(ceil(10000*N_STFT/fs
 A_compen = db2mag(A_compen);
 
 % input data time domain
-setNr = 1;
-if setNr == 1
-    totalFileNr = 10;
-else
-    totalFileNr = 8;
-end
-for fileNr = 1:totalFileNr
-    [input_t, fs_input] = audioread(sprintf("Temporary/toBeTested/set%d/Recording (%d).flac", setNr, fileNr));
-    % input data frequency domain
-    input_stft = calc_STFT(input_t, fs_input, win, N_STFT, R_STFT, 'onesided');
-    xTickProp = [0, R_STFT/fs_input, 0]; % R_STFT/fs_input, fs_input/R_STFT
-    yTickProp = [0, fs_input/(2000*R_STFT), R_STFT/2];
-    cRange    = [-45 15];
-    % plot input
-    fig_in = figure;
-    iterations = numel(input_stft(1,1,:));
-    for i = 1:iterations
-        subplot (iterations, 1, i);
-        plotSpec(input_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Freq (kHz)');
+for setNr = 1:2
+    if setNr == 1
+        totalFileNr = 10;
+    else
+        totalFileNr = 8;
     end
-    xlabel("Time");
-    
-    % initialize the output
-    output_stft = zeros(numel(input_stft(:,1,1)),numel(input_stft(1,:,1)),1);
-    
-    % pipeline
-    % calculate psd
-    n_freq_bins = numel(input_stft(:,1,1));
-    
-    % calculate coefficients then apply
-    for i = 1:n_freq_bins
-        % delay and sum algorithm
-        dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
-        d_dasb = exp(-1j*2*pi*(fs_input/N_STFT*n_freq_bins)*dasb_delay)/numel(m_pos(1,:));
-        w_dasb =(d_dasb.*A_compen(i,:)).';
-%         w_dasb = d_dasb.';
-        %normalization
-        w_dasb = w_dasb/sum(abs(w_dasb));
-        output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_dasb;
+    for fileNr = 1:totalFileNr
+        [input_t, fs_input] = audioread(sprintf("Temporary/toBeTested/set%d_Recording (%d).flac", setNr, fileNr));
+        % input data frequency domain
+        input_stft = calc_STFT(input_t, fs_input, win, N_STFT, R_STFT, 'onesided');
+        xTickProp = [0, R_STFT/fs_input, 0]; % R_STFT/fs_input, fs_input/R_STFT
+        yTickProp = [0, fs_input/(2000*R_STFT), R_STFT/2];
+        cRange    = [-45 15];
+        % plot input
+        fig_in = figure;
+        iterations = numel(input_stft(1,1,:));
+        for i = 1:iterations
+            subplot (iterations, 1, i);
+            plotSpec(input_stft(:,:,i),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Freq (kHz)');
+        end
+        xlabel("Time");
+        
+        % initialize the output
+        output_stft = zeros(numel(input_stft(:,1,1)),numel(input_stft(1,:,1)),1);
+        
+        % pipeline
+        % calculate psd
+        n_freq_bins = numel(input_stft(:,1,1));
+        
+        % calculate coefficients then apply
+        for i = 1:n_freq_bins
+            % delay and sum algorithm
+            dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
+            d_dasb = exp(-1j*2*pi*(fs_input/N_STFT*n_freq_bins)*dasb_delay)/numel(m_pos(1,:));
+            w_dasb =(d_dasb.*A_compen(i,:)).'; % DSC
+    %         w_dasb = d_dasb.'; % DS
+            %normalization
+            w_dasb = w_dasb/sum(abs(w_dasb));
+            output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_dasb;
+        end
+        
+        % plot output
+        fig_out = figure;
+        plotSpec(output_stft(:,:,1),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Freq (kHz)');
+        xlabel("Time");
+        
+        % output in time domain
+        output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
+        
+        % write output signal
+        audiowrite(sprintf("Temporary/toBeTested/out_DSC/set%d_Recording (%d).flac", setNr, fileNr), output_t, fs_input);
+        
+        % save plots
+        saveas(fig_in, sprintf("Temporary/figures/in_DSC/set%d_Recording (%d).png", setNr, fileNr));
+        saveas(fig_out,sprintf("Temporary/figures/out_DSC/set%d_Recording (%d).png", setNr, fileNr));
+        disp("Job done!");
     end
-    
-    % plot output
-    fig_out = figure;
-    plotSpec(output_stft(:,:,1),  'mag', xTickProp, yTickProp, cRange, 0); ylabel('Freq (kHz)');
-    xlabel("Time");
-    
-    % output in time domain
-    output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
-    
-    % write output signal
-    audiowrite(sprintf("Temporary/toBeTested/set%d_out_DSC/Recording (%d).flac", setNr, fileNr), output_t, fs_input);
-    
-    % save plots
-    saveas(fig_in, sprintf("Temporary/Figures/set%d/DSC_in_rec%d.png", setNr, fileNr));
-    saveas(fig_out,sprintf("Temporary/Figures/set%d/DSC_out_rec%d.png", setNr, fileNr));
-    disp("Job done!");
 end
 
 %% calculate SNR
 clc;
 setNr = 1;
 fileNr = 1;
-input_t = audioread(sprintf("Temporary/toBeTested/set%d/Recording (%d).flac", fileNr));
-N_in = audioread(sprintf("Temporary/toBeTested/set%d/Noise (%d).flac", fileNr));
+input_t = audioread(sprintf("Temporary/toBeTested/set%d_Recording (%d).flac", setNr, fileNr));
+N_in = audioread(sprintf("Temporary/toBeTested/set%d_Noise (%d).flac", setNr, fileNr));
 
-output_t = audioread(sprintf("Temporary/toBeTested/set%d_out_DSC/Recording (%d).flac", setNr, fileNr));
-N_out = audioread(sprintf("Temporary/toBeTested/set%d_out_DSC/Noise (%d).flac", setNr, fileNr));
+output_t = audioread(sprintf("Temporary/toBeTested/out_DSC/set%d_Recording (%d).flac", setNr, fileNr));
+N_out = audioread(sprintf("Temporary/toBeTested/out_DSC/set%d_Recording (%d).flac", setNr, fileNr));
 noise_in_psd = pwelch(N_in);
 noise_out_psd = pwelch(N_out);
 y_psd = pwelch(input_t);
