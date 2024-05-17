@@ -36,6 +36,7 @@ title('SNR Improvement for Set 1');
 xlabel('Recording');
 ylabel('SNR Improvement (dB)');
 legend('DS', 'DS-C', 'MVDR', 'MWF');
+grid on;
 
 figure;
 bar(1:size(data_set2, 1), data_set2(:, 2:5), 'grouped');
@@ -43,3 +44,4 @@ title('SNR Improvement for Set 2');
 xlabel('Recording');
 ylabel('SNR Improvement (dB)');
 legend('DS', 'DS-C', 'MVDR', 'MWF');
+grid on;
