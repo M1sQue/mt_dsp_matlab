@@ -62,4 +62,3 @@ xlabel('Set number');
 ylabel('SNR Improvement (dB)');
 legend('DS', 'DS-C', 'MVDR', 'MWF');
 hold off;
-
