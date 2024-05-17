@@ -1,4 +1,5 @@
 beamImprovements = zeros(4, 1);
+avg = zeros(8, 1);
 for setNr = 1:2
     if setNr == 1
         totalFileNr = 18;
@@ -29,6 +30,19 @@ for setNr = 1:2
         end
         text = sprintf("& Rec.%d & %.2f & %.2f & %.2f & %.2f & %.2f \\", fileNr, input_SNR, beamImprovements(1), beamImprovements(2), beamImprovements(3), beamImprovements(4));
         disp(text);
+        for j = 1+4*(setNr-1):4+4*(setNr-1)
+            avg(j) = avg(j)+beamImprovements(j-4*(setNr-1));
+        end
     end
-    
+    for j = 1+4*(setNr-1):4+4*(setNr-1)
+        avg(j) = avg(j)/totalFileNr;
+    end
 end
+%% plot averages
+data_set = reshape(avg, 2, 4);
+figure;
+bar(1:size(data_set, 1), data_set(:, :), 'grouped');
+title('Average SNR Improvement');
+xlabel('Set number');
+ylabel('SNR Improvement (dB)');
+legend('DS', 'DS-C', 'MVDR', 'MWF');
