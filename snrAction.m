@@ -57,7 +57,7 @@ for i = 1:numBars
     errorbar(x, data_set(:, i), errors(:, i), 'k', 'linestyle', 'none');
 end
 
-title('Average SNR Improvement');
+% title('Average SNR Improvement');
 xlabel('Set number');
 ylabel('SNR Improvement (dB)');
 legend('DS', 'DS-C', 'MVDR', 'MWF');
