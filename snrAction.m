@@ -27,7 +27,7 @@ for setNr = 1:2
             snr_improvement = output_SNR - input_SNR;
             beamImprovements(typeNr) = snr_improvement;
         end
-        text = sprintf("& Rec.%d    & %.2f & %.2f & %.2f & %.2f & %.2f \\", fileNr, input_SNR, beamImprovements(1), beamImprovements(2), beamImprovements(3), beamImprovements(4));
+        text = sprintf("& Rec.%d & %.2f & %.2f & %.2f & %.2f & %.2f \\", fileNr, input_SNR, beamImprovements(1), beamImprovements(2), beamImprovements(3), beamImprovements(4));
         disp(text);
     end
     
