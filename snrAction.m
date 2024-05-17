@@ -40,9 +40,26 @@ for setNr = 1:2
 end
 %% plot averages
 data_set = reshape(avg, 2, 4);
+
+variance = rand(2, 4) * 2;
+errors = sqrt(variance);
+
 figure;
-bar(1:size(data_set, 1), data_set(:, :), 'grouped');
+bar_handle = bar(1:size(data_set, 1), data_set, 'grouped');
+hold on;
+
+numGroups = size(data_set, 1);
+numBars = size(data_set, 2);
+groupWidth = min(0.8, numBars/(numBars + 1.5));
+
+for i = 1:numBars
+    x = bar_handle(i).XEndPoints;
+    errorbar(x, data_set(:, i), errors(:, i), 'k', 'linestyle', 'none');
+end
+
 title('Average SNR Improvement');
 xlabel('Set number');
 ylabel('SNR Improvement (dB)');
 legend('DS', 'DS-C', 'MVDR', 'MWF');
+hold off;
+
