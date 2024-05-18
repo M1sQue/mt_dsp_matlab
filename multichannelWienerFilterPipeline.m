@@ -72,8 +72,8 @@ for setNr = 1:2
         audiowrite(sprintf("Temporary/toBeTested/out_MWF/set%d_Recording (%d).flac", setNr, fileNr), output_t, fs_input);
     
         % save plots
-        saveas(fig_in, sprintf("Temporary/figures/set%d_Recording (%d).png", setNr, fileNr));
-        saveas(fig_out,sprintf("Temporary/figures/out_MWF/set%d_Recording (%d).png", setNr, fileNr));
+        saveas(fig_in, sprintf("Temporary/figures/set%d_Recording (%d).pdf", setNr, fileNr));
+        saveas(fig_out,sprintf("Temporary/figures/out_MWF/set%d_Recording (%d).pdf", setNr, fileNr));
         disp("Job done!");
     end
 end
