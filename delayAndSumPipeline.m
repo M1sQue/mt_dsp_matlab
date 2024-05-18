@@ -50,7 +50,7 @@ polars = mag2db(polars);
 maxMag = max(polars(:));
 polars = polars-maxMag*ones(size(polars));
 flag = 1;
-save("MatData/polars.mat", "polars", "elevation_deg", "step", "s_pos", "fs");
+save("MatData/polars.mat", "polars", "elevation_deg", "step", "c", "m_pos", "s_pos", "fs");
 disp("Job done");
 %%
 addpath("FromThomasDietzen\")
