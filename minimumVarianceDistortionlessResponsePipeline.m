@@ -87,27 +87,3 @@ for setNr = 1:2
         disp("Job done!");
     end
 end
-
-%% calculate SNR
-clc;
-setNr = 1;
-fileNr = 1;
-input_t = audioread(sprintf("Temporary/toBeTested/set%d_Recording (%d).flac", setNr, fileNr));
-N_in = audioread(sprintf("Temporary/toBeTested/set%d_N (%d).flac", setNr, fileNr));
-
-output_t = audioread(sprintf("Temporary/toBeTested/out_MVDR/set%d_Recording (%d).flac", setNr, fileNr));
-N_out = audioread(sprintf("Temporary/toBeTested/out_MVDR/set%d_N (%d).flac", setNr, fileNr));
-noise_in_psd = pwelch(N_in);
-noise_out_psd = pwelch(N_out);
-y_psd = pwelch(input_t);
-x_hat_psd = pwelch(output_t);
-
-signal_in_psd = mean(abs(y_psd)) - mean(abs(noise_in_psd));
-input_SNR = 10*log10(sum(signal_in_psd)/sum(mean(abs(noise_in_psd))));
-disp(["input SNR: ",input_SNR]);
-
-signal_psd_out = mean(abs(x_hat_psd)) - mean(abs(noise_out_psd));
-output_SNR = 10*log10(sum(signal_psd_out)/sum(mean(abs(noise_out_psd))));
-disp(["output SNR: ",output_SNR]);
-snr_improvement = output_SNR - input_SNR;
-disp(["SNR improvement: ",snr_improvement]);
