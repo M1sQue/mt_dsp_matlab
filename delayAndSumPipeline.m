@@ -3,8 +3,6 @@
 clear;
 addpath("FromThomasDietzen\")
 N_STFT = 2048;
-R_STFT = N_STFT/2;
-win = sqrt(hann(N_STFT,'periodic'));
 
 r = 0.057; % coordinate unit length
 c = 343.3; % speed of sound
@@ -52,11 +50,14 @@ polars = mag2db(polars);
 maxMag = max(polars(:));
 polars = polars-maxMag*ones(size(polars));
 flag = 1;
-save("MatData/polars.mat", "polars");
+save("MatData/polars.mat", "polars", "elevation_deg", "step", "s_pos", "fs");
 disp("Job done");
 %%
 addpath("FromThomasDietzen\")
 load("MatData/polars.mat");
+N_STFT = 2048;
+R_STFT = N_STFT/2;
+win = sqrt(hann(N_STFT,'periodic'));
 
 %compensation coefficient for target direction range:
 %elevation_deg-compen_width_deg/2:elevation_deg+compen_width_deg/2
