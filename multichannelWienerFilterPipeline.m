@@ -51,8 +51,8 @@ for setNr = 1:2
         % calculate coefficients then apply
         for i = 1:n_freq_bins
             w_mwf = (squeeze(P_YY(i,:,:))-squeeze(P_NN(i,:,:)))/squeeze(P_YY(i,:,:));
-            for j = 1:numel(w_mwf(:,1))
-                w_mwf(j, :) = w_mwf(j, :)/sum(abs(w_mwf(j, :)));
+            for j = 1:numel(w_mwf(1,:))
+                w_mwf(:, j) = w_mwf(:, j)/sum(abs(w_mwf(:, j)));
             end
             output_stft(i,:,:) = squeeze(input_stft(i,:,:))*w_mwf;
         end

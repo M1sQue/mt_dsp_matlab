@@ -67,7 +67,7 @@ A_compen = -mean(polars(:,compen_index,:),2);
 %discard compensation for f<200Hz(sinesweep not covered) 
 A_compen(1:ceil(200*N_STFT/fs),:) =  ones(ceil(200*N_STFT/fs),numel(A_compen(1,:)));
 %discard compensation for f>8000Hz(not accurate) 
-A_compen(ceil(10000*N_STFT/fs):end,:) =  ones(size(A_compen(ceil(10000*N_STFT/fs):end,:)));
+% A_compen(ceil(10000*N_STFT/fs):end,:) =  ones(size(A_compen(ceil(10000*N_STFT/fs):end,:)));
 A_compen = db2mag(A_compen);
 
 % input data time domain
@@ -105,10 +105,10 @@ for setNr = 1:2
             % delay and sum algorithm
             dasb_delay = s_pos*m_pos/norm(s_pos)/c; % to compensate the delay aka alignment: times "-" to a "-"
             d_dasb = exp(-1j*2*pi*(fs_input/N_STFT*(i-1))*dasb_delay)/numel(m_pos(1,:));
-            w_dasb =(d_dasb.*A_compen(i,:)).';
-    %         w_dasb = d_dasb.';
+%             w_dasb =(d_dasb.*A_compen(i,:)).';
+            w_dasb = d_dasb.';
             %normalization
-            w_dasb = w_dasb/sum(abs(w_dasb));
+            w_dasb = w_dasb/numel(m_pos(1,:));
             output_stft(i,:,:) = squeeze(input_stft(i,:,:)) * w_dasb;
         end
         
@@ -121,11 +121,11 @@ for setNr = 1:2
         output_t = calc_ISTFT(output_stft, win, N_STFT, R_STFT, 'onesided');
         
         % write output signal
-        audiowrite(sprintf("Temporary/toBeTested/out_DSC/set%d_Recording (%d).flac", setNr, fileNr), output_t, fs_input);
+        audiowrite(sprintf("Temporary/toBeTested/out_DS/set%d_Recording (%d).flac", setNr, fileNr), output_t, fs_input);
         
         % save plots
         saveas(fig_in, sprintf("Temporary/figures/set%d_Recording (%d).pdf", setNr, fileNr));
-        saveas(fig_out,sprintf("Temporary/figures/out_DSC/set%d_Recording (%d).pdf", setNr, fileNr));
+        saveas(fig_out,sprintf("Temporary/figures/out_DS/set%d_Recording (%d).pdf", setNr, fileNr));
         disp("Job done!");
     end
 end

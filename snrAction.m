@@ -39,7 +39,8 @@ for setNr = 1:2
     end
 end
 %% plot averages
-data_set = reshape(avg, 2, 4);
+data_set = reshape(avg, 4, 2);
+data_set = data_set.';
 
 variance = rand(2, 4) * 2;
 errors = sqrt(variance);
