@@ -54,7 +54,7 @@ for setNr = 1:2
             for j = 1:numel(w_mwf(1,:))
                 w_mwf(:, j) = w_mwf(:, j)/sum(abs(w_mwf(:, j)));
             end
-            output_stft(i,:,:) = squeeze(input_stft(i,:,:))*w_mwf;
+            output_stft(i,:,:) = squeeze(input_stft(i,:,:))*conj(w_mwf);
         end
         
         % plot output
