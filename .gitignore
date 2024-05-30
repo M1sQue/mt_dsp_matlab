@@ -1,11 +1,8 @@
 References/
 *.mat
 AnechoicRoomMeasurements/
-FromThomasDietzen/
-MatData/
 Microphone_Impulse_Responses/
 MonitorNoiseAudio/
-OldScripts/
 python_sweep_files/
 SineSweep/
 SoundTalksBramZeineb/
